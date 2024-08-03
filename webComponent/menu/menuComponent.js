@@ -94,7 +94,7 @@ export class MenuComponent extends HTMLElement {
       ></a>
       <ul class="side-dropdown">
         <li><a href="#" class="ubicacion agregar">Ciudad</a></li>
-        <li><a href="#" class="ubicacion editar">Estado de un pedido</a></li>
+        <li><a href="#" class="status">Estado de un pedido</a></li>
       </ul>
     </li>
 
@@ -143,6 +143,8 @@ export class MenuComponent extends HTMLElement {
       console.log(option)
       if(option === 'gama'){
         main.innerHTML = `<gama-component></gama-component>`
+      }else if(option === 'status'){
+        main.innerHTML = `<status-component></status-component>`
       }
     })
   }
