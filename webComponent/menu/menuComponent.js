@@ -93,7 +93,7 @@ export class MenuComponent extends HTMLElement {
         <i class="bx bx-chevron-right icon-right"></i
       ></a>
       <ul class="side-dropdown">
-        <li><a href="#" class="ubicacion agregar">Ciudad</a></li>
+        <li><a href="#" class="ciudad">Ciudad</a></li>
         <li><a href="#" class="status">Estado de un pedido</a></li>
       </ul>
     </li>
@@ -147,6 +147,8 @@ export class MenuComponent extends HTMLElement {
         main.innerHTML = `<status-component></status-component>`
       }else if(option === 'metodoPago'){
         main.innerHTML = `<payment-method-component></payment-method-component>`
+      }else if(option === 'ciudad'){
+        main.innerHTML = `<city-component></city-component>`
       }
     })
   }
