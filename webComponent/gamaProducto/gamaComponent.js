@@ -1,5 +1,5 @@
 // root/webComponent/menu/menuComponent.js
-import { createImput, manipularModal } from "../../js/utils/form.js";
+import { createImput, manipularModal, poblarFormulario, alertaGenerica, alertaTemporal } from "../../js/utils/form.js";
 export class MyElement extends HTMLElement {
   constructor() {
     super();
@@ -10,17 +10,18 @@ export class MyElement extends HTMLElement {
     this.llenarFormulario();
     this.registrar();
     this.detectarId();
-    // this.actualizarData();
+    this.tabla();
+    this.alerta = document.querySelector(".alerta")
   }
 
   render() {
     this.innerHTML = `
       <div class="container " style="margin-top: 20px;">
         <div class="row padre">
-          <div class="col hija1">
-            1 of 3
+          <div class="col">
           </div>
           <div class="col-8 hija2 shadow p-3 mb-5 bg-body rounded">
+          <div class="alerta"></div>
             <button type="button" class="btn btn-outline-dark"  data-bs-toggle="modal" data-bs-target="#modalGama">
                 Crear gama de producto
               </button>
@@ -37,9 +38,10 @@ export class MyElement extends HTMLElement {
                 <tbody id="info-tabla">
                 </tbody>
               </table>
+              <div class="contenedor">
+              </div>
           </div>
-          <div class="col hija3">
-            3 of 3
+          <div class="col">
           </div>
         </div>
         <!-- Button trigger modal -->  
@@ -97,27 +99,29 @@ export class MyElement extends HTMLElement {
 
       const inputs = new FormData(this.formulario);
       const data = Object.fromEntries(inputs); 
-      console.log(data)
+
       if (data.id !== '') {
-        console.log("actaulizar");
         this.actualizarData(data);
       } else if (data.id === '') {
-        console.log("registro");
         data.id = this.datos.length + 1;
-        console.log(data);
         this.datos.push(data);
-        console.log(this.datos);
       } else {
-        console.log("no se que pasa");
+        console.log("Error metodo registrar");
       }
       
       manipularModal(this.modal, "hide");
+      alertaTemporal(this.alerta, "Procedimiento realizado con exito", 'success')
       this.tabla();
       this.formulario.reset();
     });
   }
 
+
   tabla() {
+    const contenedor = document.querySelector(".contenedor")
+    if(this.datos.length === 0){
+      alertaGenerica('No hay gamas de producto registradas',contenedor)
+    }else{contenedor.innerHTML = ""}
     const cuerpoTabal = document.querySelector("#info-tabla");
     cuerpoTabal.innerHTML = "";
     this.datos.forEach((dato) => {
@@ -134,21 +138,21 @@ export class MyElement extends HTMLElement {
     });
   }
 
+
   detectarId() {
     const cuerpoTabal = document.querySelector("#info-tabla");
     cuerpoTabal.addEventListener("click", (e) => {
       if (e.target.classList.contains("idHere")) {
         e.preventDefault();
         let id = e.target.id;
-        console.log(id);
         const objeto = this.buscarObjecto(id);
-        this.poblarFormulario(objeto);
-        console.log(objeto);
+        poblarFormulario(objeto, this.formulario, this.modal);
       } else {
-        console.log("No hay evento");
+        console.log("Este elemento no tiene la clase");
       }
     });
   }
+
 
   buscarObjecto(id) {
     let dato = "";
@@ -156,23 +160,6 @@ export class MyElement extends HTMLElement {
       if (d.id == id) dato = d;
     });
     return dato;
-  }
-
-  poblarFormulario(datos) {
-    console.log(datos);
-    Object.keys(datos).forEach((llave) => {
-      const input = this.formulario.querySelector(
-        `[name="${llave}"], #${llave}`
-      );
-      console.log(input);
-      if (input) {
-        input.value = datos[llave];
-      } else {
-        console.log(`Campo ${llave} no existe en el formulario`);
-      }
-    });
-
-    manipularModal(this.modal, "show");
   }
 
   actualizarData(data) {
