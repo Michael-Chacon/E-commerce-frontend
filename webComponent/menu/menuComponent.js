@@ -58,7 +58,7 @@ export class MenuComponent extends HTMLElement {
       ></a>
       <ul class="side-dropdown">
         <li><a href="#" class="estado agregar">Listado</a></li>
-        <li><a href="#" class="estado buscar">Metodos de pago</a></li>
+        <li><a href="#" class="metodoPago">Metodos de pago</a></li>
         <li><a href="#" class="estado editar">Filtro por cliente</a></li>
         <li><a href="#" class="estado eliminar">Filtro por método</a></li>
       </ul>
@@ -145,6 +145,8 @@ export class MenuComponent extends HTMLElement {
         main.innerHTML = `<gama-component></gama-component>`
       }else if(option === 'status'){
         main.innerHTML = `<status-component></status-component>`
+      }else if(option === 'metodoPago'){
+        main.innerHTML = `<payment-method-component></payment-method-component>`
       }
     })
   }
