@@ -1,6 +1,7 @@
 // root/webComponent/menu/menuComponent.js
 import { createImput, manipularModal, poblarFormulario, alertaGenerica, alertaTemporal } from "../../js/utils/form.js";
-export class MyElement extends HTMLElement {
+
+export class GamaComponent extends HTMLElement {
   constructor() {
     super();
     this.render();
@@ -20,7 +21,7 @@ export class MyElement extends HTMLElement {
         <div class="row padre">
           <div class="col">
           </div>
-          <div class="col-8 hija2 shadow p-3 mb-5 bg-body rounded">
+          <div class="col-10 hija2 shadow p-3 mb-5 bg-body rounded">
           <div class="alerta"></div>
             <button type="button" class="btn btn-outline-dark"  data-bs-toggle="modal" data-bs-target="#modalGama">
                 Crear gama de producto
@@ -172,4 +173,4 @@ export class MyElement extends HTMLElement {
   }
 } //fin de la clase
 
-customElements.define("my-element", MyElement);
+customElements.define("gama-component", GamaComponent);

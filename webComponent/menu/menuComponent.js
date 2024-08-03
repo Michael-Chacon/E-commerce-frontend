@@ -22,10 +22,10 @@ export class MenuComponent extends HTMLElement {
           <i class="bx bx-chevron-right icon-right"></i
         ></a>
         <ul class="side-dropdown">
-          <li><a href="#" class="activos agregar">Listado</a></li>
-          <li><a href="#" class="activos buscar">Gama producto</a></li>
-          <li><a href="#" class="activos eliminar">Bajo Stock</a></li>
-          <li><a href="#" class="activos editar">Filtrar por gama</a></li>
+          <li><a href="#" class="agregar">Listado</a></li>
+          <li><a href="#" class="gama">Gama producto</a></li>
+          <li><a href="#" class="eliminar">Bajo Stock</a></li>
+          <li><a href="#" class="editar">Filtrar por gama</a></li>
         </ul>
       </li>
       <li>
@@ -135,6 +135,16 @@ export class MenuComponent extends HTMLElement {
     <!-- MAIN -->
   </section>
         `;
+
+    const padre = document.querySelector(".side-menu");
+    const main = document.querySelector(".main");
+    padre.addEventListener("click",  (e) => {
+      const option = e.target.classList[0];
+      console.log(option)
+      if(option === 'gama'){
+        main.innerHTML = `<gama-component></gama-component>`
+      }
+    })
   }
 }
 
