@@ -103,7 +103,7 @@ export class CityComponent extends HTMLElement{
           } else {
             console.log("Error metodo registrar");
           }
-          
+          console.log(data)
           manipularModal(this.modal, "hide");
           alertaTemporal(this.alerta, "Successful process", 'success')
           this.tabla();

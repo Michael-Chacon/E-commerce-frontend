@@ -39,6 +39,38 @@ export function createImput(
   return elementoPadre;
 }
 
+export function createSelect(elementoPadre, iddinamico, nombre, subtexto, data){
+  const divPadre = document.createElement("div");
+  divPadre.classList.add("mt-3");
+
+  const newLabel = document.createElement("label");
+  newLabel.classList.add("form-label");
+  newLabel.setAttribute("for", iddinamico);
+  newLabel.textContent = capitalizeFirstLetter(nombre);
+
+  const select = document.createElement('select');
+  select.classList.add("form-select", "mb-3");
+  select.setAttribute("id", iddinamico);
+  select.setAttribute("name", nombre);
+  select.setAttribute("placeholder", subtexto);
+  select.setAttribute("required", true);
+  select.setAttribute("aria-label", "Default select example");
+
+  console.log(data)
+  data.forEach(city => {
+    const option = document.createElement('option');
+    option.value = city.id;
+    option.textContent = city.name;
+    select.appendChild(option);
+  });
+
+  divPadre.appendChild(newLabel);
+  
+  divPadre.appendChild(select);
+  elementoPadre.appendChild(divPadre);
+  return elementoPadre;
+}
+
 function capitalizeFirstLetter(text) {
   if (!text) return text;
   return text.charAt(0).toUpperCase() + text.slice(1);

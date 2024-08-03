@@ -81,7 +81,7 @@ export class MenuComponent extends HTMLElement {
         <i class="bx bx-chevron-right icon-right"></i
       ></a>
       <ul class="side-dropdown">
-        <li><a href="#" class="ubicacion agregar">Listado</a></li>
+        <li><a href="#" class="listaOfincinas">Listado</a></li>
         <li><a href="#" class="ubicacion editar">Editar</a></li>
         <li><a href="#" class="ubicacion eliminar">Eliminar</a></li>
         <li><a href="#" class="ubicacion buscar">Buscar</a></li>
@@ -109,7 +109,7 @@ export class MenuComponent extends HTMLElement {
       <span class="divider"></span>
       <div class="profile">
         <img
-          src="storage/imgs/logoCampus.png"
+          src=""
           alt=""
         />
         <ul class="profile-link">
@@ -149,6 +149,8 @@ export class MenuComponent extends HTMLElement {
         main.innerHTML = `<payment-method-component></payment-method-component>`
       }else if(option === 'ciudad'){
         main.innerHTML = `<city-component></city-component>`
+      }else if(option === 'listaOfincinas'){
+        main.innerHTML = `<office-component></office-component>`
       }
     })
   }
