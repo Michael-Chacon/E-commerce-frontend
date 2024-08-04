@@ -77,7 +77,14 @@ export class PaymentMethodComponent extends HTMLElement{
           "input"
         );
 
-    
+        const botones = document.createElement("div");
+        botones.innerHTML = `
+              <div class="modal-footer">
+                <button type="button" class="btn btn-outline-danger" data-bs-dismiss="modal">Cancelar</button>
+                <button type="submit" class="btn btn-outline-dark" id="btnRegistrar">Registrar</button>
+              </div>
+            `;
+        this.formulario.appendChild(botones);
         
       }
 
