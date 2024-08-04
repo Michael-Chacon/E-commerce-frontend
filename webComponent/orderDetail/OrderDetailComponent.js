@@ -35,10 +35,10 @@ export class OrderDetailComponent extends HTMLElement {
           <div class="col-8">
               <div class="row">
                 <div class="col">
-                  <div class="card mb-4 mt-2 bg-dark" >
+                  <div class="card shadow mb-4 mt-2 bg-white" >
                   <div class="card-body">
-                    <h5 class="card-title text-center text-white">Order Details (id)</h5>
-                    <table class="table table-dark table-hover">
+                    <h5 class="card-title text-center ">Order Details ${this.idOrder}</h5>
+                    <table class="table table-hover">
                       <tbody>
                         <tr>
                           <th scope="row">Order date</th>
