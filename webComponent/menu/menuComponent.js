@@ -48,7 +48,6 @@ export class MenuComponent extends HTMLElement {
         <li><a href="#" class="persona agregar">Listado</a></li>
         <li><a href="#" class="persona editar">Por estado</a></li>
         <li><a href="#" class="persona eliminar">Por Rango de Fechas</a></li>
-        <li><a href="#" class="persona buscar">Buscar</a></li>
       </ul>
     </li>
       <li>
@@ -72,7 +71,6 @@ export class MenuComponent extends HTMLElement {
         <li><a href="#" class="listaEmpleados">Listado</a></li>
         <li><a href="#" class="marca editar">Por oficina</a></li>
         <li><a href="#" class="marca eliminar">Pedidos asignados</a></li>
-        <li><a href="#" class="marca buscar">Buscar</a></li>
       </ul>
     </li>
     <li>
@@ -84,7 +82,6 @@ export class MenuComponent extends HTMLElement {
         <li><a href="#" class="listaOfincinas">Listado</a></li>
         <li><a href="#" class="ubicacion editar">Editar</a></li>
         <li><a href="#" class="ubicacion eliminar">Eliminar</a></li>
-        <li><a href="#" class="ubicacion buscar">Buscar</a></li>
       </ul>
     </li>
     <li>

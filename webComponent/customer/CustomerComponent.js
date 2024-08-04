@@ -76,6 +76,7 @@ export class CustomerComponent extends HTMLElement {
                             <div class="col" id="l1"></div>
                             <div class="col" id="l2"></div>
                         </div>
+                        <hr>  
                         <div class="row">
                             <div class="col" id="em"></div>
                             <div class="col" id="tel"></div>
