@@ -7,22 +7,18 @@ import {
   createSelect,
 } from "../../js/utils/form.js";
 
-export class OrderComponent extends HTMLElement {
+export class OrderDetailComponent extends HTMLElement {
   constructor() {
     super();
+    this.idOrder = this.getAttribute("idOrder");
     this.render();
     this.formulario = document.querySelector("#formGama");
     this.modal = document.querySelector("#modal");
     this.datos = [];
-    this.status = [
-      { id: 1, name: "entregado" },
-      { id: 2, name: "enviado" },
-      { id: 3, name: "en bodega" },
-    ];
     this.cliente = [
-      { id: 1, name: "Briand" },
-      { id: 2, name: "Henry" },
-      { id: 3, name: "Diego" },
+      { id: 1, name: "Teclado" },
+      { id: 2, name: "Monitor" },
+      { id: 3, name: "Desktop" },
     ];
     this.llenarFormulario();
     this.registrar();
@@ -32,24 +28,79 @@ export class OrderComponent extends HTMLElement {
   }
 
   render() {
-    this.innerHTML = `
+    this.innerHTML = /*html*/ `
           <div class="container " style="margin-top: 20px;">
+          <div class="row">
+          <div class="col"></div>
+          <div class="col-8">
+              <div class="row">
+                <div class="col">
+                  <div class="card mb-4 mt-2 bg-dark" >
+                  <div class="card-body">
+                    <h5 class="card-title text-center text-white">Order Details (id)</h5>
+                    <table class="table table-dark table-hover">
+                      <tbody>
+                        <tr>
+                          <th scope="row">Order date</th>
+                          <td>10/10/2025</td>
+                        </tr>
+                        <tr>
+                          <th scope="row">Status</th>
+                          <td>Send</td>
+                        </tr>
+                        <tr>
+                          <th scope="row">Delivery date</th>
+                          <td>Send</td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+                <div class="col">
+                  <div class="card mb-4 mt-2 bg-dark" >
+                    <div class="card-body">
+                      <h5 class="card-title text-center text-white">Customer Details</h5>
+                      <table class="table table-dark table-hover">
+                        <tbody>
+                          <tr>
+                            <th scope="row">Name</th>
+                            <td>Mark</td>
+                          </tr>
+                          <tr>
+                            <th scope="row">Emain</th>
+                            <td>alexis@gmail.com</td>
+                          </tr>
+                          <tr>
+                            <th scope="row">Phone</th>
+                            <td>1234567890</td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </div>
+              </div>
+          </div>
+          <div class="col"></div>
+        </div>
           <div class="row padre">
-              <div class="col-12 hija2 shadow p-3 mb-5 bg-body rounded">
+              <div class="col">
+              </div>
+              <div class="col-10 hija2 shadow p-3 mb-5 bg-body rounded">
               <div class="alerta"></div>
               <button type="button" class="btn btn-outline-dark"  data-bs-toggle="modal" data-bs-target="#modal">
-                  Add order
+                  Add product
                   </button>
                   <hr>
                   <table class="table table-bordered">
                   <thead>
                       <tr>
                       <th scope="col">Id</th>
-                      <th scope="col">Customer</th>
-                      <th scope="col">Status</th>
-                      <th scope="col">Order date</th>
-                      <th scope="col">Expected date</th>
-                      <th scope="col">Delivery date</th>
+                      <th scope="col">Producto</th>
+                      <th scope="col">Amoung</th>
+                      <th scope="col">Unit price</th>
+                      <th scope="col">Total</th>
                       <th colspan="2"></th>
                       </tr>
                   </thead>
@@ -59,13 +110,15 @@ export class OrderComponent extends HTMLElement {
                   <div class="contenedor">
                   </div>
               </div>
+              <div class="col">
+              </div>
           </div>
           <!-- Modal -->
           <div class="modal fade" id="modal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
-              <div class="modal-dialog">
+              <div class="modal-dialog modal-sm">
               <div class="modal-content">
                   <div class="modal-header">
-                  <h5 class="modal-title" id="staticBackdropLabel">New order</h5>
+                  <h5 class="modal-title" id="staticBackdropLabel">New product</h5>
                   <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                   </div>
                   <div class="modal-body">
@@ -76,7 +129,6 @@ export class OrderComponent extends HTMLElement {
               </div>
           </div>
           `;
-    // console.log(mainHtml)
   }
 
   // --------------------------- metodos ----------------------------------------------------
@@ -88,7 +140,7 @@ export class OrderComponent extends HTMLElement {
     createSelect(
       this.formulario,
       "",
-      "customer_code_or",
+      "producto_id_order",
       "customer",
       this.cliente
     );
@@ -96,39 +148,10 @@ export class OrderComponent extends HTMLElement {
     createImput(
       this.formulario,
       "",
-      "date",
-      "order_date",
-      "Order date",
+      "number",
+      "quantity",
+      "Amoung units",
       "input"
-    );
-
-    createImput(
-      this.formulario,
-      "",
-      "date",
-      "expected_date",
-      "Expected date",
-      "input"
-    );
-
-    createImput(
-      this.formulario,
-      "",
-      "date",
-      "delivery_date",
-      "Delivery date",
-      "input"
-    );
-
-    createSelect(this.formulario, "", "status_code_or", "status", this.status);
-
-    createImput(
-      this.formulario,
-      "",
-      "text",
-      "comment",
-      "Commente about order",
-      "textarea"
     );
 
     const botones = document.createElement("div");
@@ -167,33 +190,24 @@ export class OrderComponent extends HTMLElement {
   tabla() {
     const contenedor = document.querySelector(".contenedor");
     if (this.datos.length === 0) {
-      alertaGenerica("No registered", contenedor);
+      alertaGenerica("No registered ", contenedor);
     } else {
       contenedor.innerHTML = "";
     }
     const cuerpoTabal = document.querySelector("#info-tabla");
     cuerpoTabal.innerHTML = "";
     this.datos.forEach((dato) => {
-      const {
-        customer_code_or,
-        status_code_or,
-        delivery_date,
-        id,
-        order_date,
-        expected_date,
-        comment,
-      } = dato;
+      const { payment_date, total, payment_method, id, customer_code_pa } =
+        dato;
       cuerpoTabal.innerHTML += /*html*/ `
                 <tr>
                 <th scope="row">${id}</th>
-                <td>${customer_code_or}</td>
-                <td>${status_code_or}</td>
-                <td>${order_date}</td>
-                <td>${expected_date}</td>
-                <td>${delivery_date}</td>
+                <td>${customer_code_pa}</td>
+                <td>${total}</td>
+                <td>${payment_method}</td>
+                <td>${payment_date}</td>
                 <td class="text-center"><a href="#" "><i class='bx bx-pencil icon-actions idHere' id="${id}"></i></a></td>
                 <td class="text-center"><i class='bx bx-trash-alt icon-actions'></i></td>
-                <td class="text-center"><i class='bx bx-detail icon-actions redireccionar' id="${id}"></i></td>
               </tr>
             `;
     });
@@ -202,16 +216,11 @@ export class OrderComponent extends HTMLElement {
   detectarId() {
     const cuerpoTabal = document.querySelector("#info-tabla");
     cuerpoTabal.addEventListener("click", (e) => {
-      e.preventDefault();
       if (e.target.classList.contains("idHere")) {
+        e.preventDefault();
         let id = e.target.id;
         const objeto = this.buscarObjecto(id);
         poblarFormulario(objeto, this.formulario, this.modal);
-      } else if (e.target.classList.contains("redireccionar")) {
-        let id = e.target.id;
-        console.log("aja", id);
-        const contenido = document.querySelector(".container")
-        contenido.parentElement.parentElement.innerHTML = `<order-detail-component idOrder="${id}"></order-detail-component>`;
       } else {
         console.log("Este elemento no tiene la clase");
       }
@@ -229,14 +238,13 @@ export class OrderComponent extends HTMLElement {
   actualizarData(data) {
     this.datos.forEach((d) => {
       if (d.id == data.id) {
-        d.customer_code_or = data.customer_code_or;
-        d.status_code_or = data.status_code_or;
-        d.order_date = data.order_date;
-        d.expected_date = data.expected_date;
-        d.delivery_date = data.delivery_date;
-        d.comment = data.comment;
+        d.customer_code_pa = data.customer_code_pa;
+        d.payment_date = data.payment_date;
+        d.payment_method = data.payment_method;
+        d.total = data.total;
       }
     });
   }
 }
-customElements.define("order-component", OrderComponent);
+
+customElements.define("order-detail-component", OrderDetailComponent);

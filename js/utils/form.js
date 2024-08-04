@@ -136,3 +136,9 @@ export function alertaTemporal(padre, mensaje, color) {
     padre.removeChild(alert);
   }, 4000);
 }
+
+// export function mainHtml(main){
+//   console.log(main)
+//   main.innerHTML = 'jalfkdl'
+//   // return main;
+// }

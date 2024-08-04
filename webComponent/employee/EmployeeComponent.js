@@ -161,7 +161,7 @@ import {
     tabla() {
       const contenedor = document.querySelector(".contenedor");
       if (this.datos.length === 0) {
-        alertaGenerica("No registered status ", contenedor);
+        alertaGenerica("No registered", contenedor);
       } else {
         contenedor.innerHTML = "";
       }

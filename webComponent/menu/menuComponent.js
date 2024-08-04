@@ -135,6 +135,7 @@ export class MenuComponent extends HTMLElement {
 
     const padre = document.querySelector(".side-menu");
     const main = document.querySelector(".main");
+    // mainHtml(main);
     padre.addEventListener("click", (e) => {
       const option = e.target.classList[0];
       console.log(option);
@@ -161,6 +162,8 @@ export class MenuComponent extends HTMLElement {
       }
     });
   }
+
+  
 }
 
 customElements.define("menu-component", MenuComponent);

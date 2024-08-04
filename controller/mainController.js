@@ -9,3 +9,6 @@ import "/webComponent/customer/CustomerComponent.js";
 import "/webComponent/payment/PaymentComponent.js";
 import "/webComponent/product/ProductComponent.js";
 import "/webComponent/order/OrderComponent.js";
+import "/webComponent/orderDetail/OrderDetailComponent.js";
+
+
