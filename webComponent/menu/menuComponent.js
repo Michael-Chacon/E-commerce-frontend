@@ -34,7 +34,7 @@ export class MenuComponent extends HTMLElement {
         <i class="bx bx-chevron-right icon-right"></i
       ></a>
       <ul class="side-dropdown">
-        <li><a href="#" class="asignacion crear">Listado</a></li>
+        <li><a href="#" class="listarClient">Listado</a></li>
         <li><a href="#" class="asignacion asignar">Por ciudad</a></li>
         <li><a href="#" class="asignacion retornar">Pedidos pendientes</a></li>
       </ul>
@@ -153,6 +153,8 @@ export class MenuComponent extends HTMLElement {
         main.innerHTML = `<office-component></office-component>`
       }else if(option === 'listaEmpleados'){
         main.innerHTML = `<employee-component></employee-component>`
+      }else if(option === 'listarClient'){
+        main.innerHTML = `<customer-component></customer-component>`
       }
     })
   }
