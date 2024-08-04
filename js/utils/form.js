@@ -137,8 +137,6 @@ export function alertaTemporal(padre, mensaje, color) {
   }, 4000);
 }
 
-// export function mainHtml(main){
-//   console.log(main)
-//   main.innerHTML = 'jalfkdl'
-//   // return main;
-// }
+export function pedirConfirmacion(element){
+  return confirm("¿Está seguro de que quiere eliminar " + element + "?")
+}

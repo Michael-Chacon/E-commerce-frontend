@@ -1,7 +1,22 @@
-// root/webComponent/menu/menuComponent.js
-import { createImput, manipularModal, poblarFormulario, alertaGenerica, alertaTemporal } from "../../js/utils/form.js";
+import {
+  createImput,
+  manipularModal,
+  poblarFormulario,
+  alertaGenerica,
+  alertaTemporal,
+  pedirConfirmacion,
+} from "../../js/utils/form.js";
+
+import {
+  deleteData,
+  getData,
+  getOneData,
+  postData,
+  updateData,
+} from "../../repository/api.js";
 
 export class GamaComponent extends HTMLElement {
+  endPoint = "gama_producto";
   constructor() {
     super();
     this.render();
@@ -12,7 +27,7 @@ export class GamaComponent extends HTMLElement {
     this.registrar();
     this.detectarId();
     this.tabla();
-    this.alerta = document.querySelector(".alerta")
+    this.alerta = document.querySelector(".alerta");
   }
 
   render() {
@@ -64,6 +79,7 @@ export class GamaComponent extends HTMLElement {
       `;
   }
 
+
   llenarFormulario() {
     createImput(this.formulario, "", "text", "id", "", "input", true);
 
@@ -94,46 +110,59 @@ export class GamaComponent extends HTMLElement {
     this.formulario.appendChild(botones);
   }
 
+
   registrar() {
-    this.formulario.addEventListener("submit", (e) => {
+    this.formulario.addEventListener("submit", async (e) => {
       e.preventDefault();
 
       const inputs = new FormData(this.formulario);
-      const data = Object.fromEntries(inputs); 
+      const data = Object.fromEntries(inputs);
 
-      if (data.id !== '') {
-        this.actualizarData(data);
-      } else if (data.id === '') {
-        data.id = this.datos.length + 1;
-        this.datos.push(data);
+      if (data.id !== "") {
+        const respuesta = await updateData(data, this.endPoint, data.id);
+        console.log(respuesta.status);
+      } else if (data.id === "") {
+        data.id = parseInt(this.datos.data.length + 1);
+        const respuesta = await postData(data, this.endPoint);
+        console.log(respuesta.status);
       } else {
-        console.log("Error metodo registrar");
+        console.log("Error al detectar el tipo de acción");
       }
-      
+
       manipularModal(this.modal, "hide");
-      alertaTemporal(this.alerta, "Procedimiento realizado con exito", 'success')
+      alertaTemporal(
+        this.alerta,
+        "Procedimiento realizado con exito",
+        "success"
+      );
       this.tabla();
       this.formulario.reset();
     });
   }
 
 
-  tabla() {
-    const contenedor = document.querySelector(".contenedor")
-    if(this.datos.length === 0){
-      alertaGenerica('No hay gamas de producto registradas',contenedor)
-    }else{contenedor.innerHTML = ""}
+  async tabla() {
+    const contenedor = document.querySelector(".contenedor");
+    this.datos = await getData(this.endPoint, "");
+
+    if (this.datos.length === 0) {
+      alertaGenerica("No hay gamas de producto registradas", contenedor);
+    } else {
+      contenedor.innerHTML = "";
+    }
+
     const cuerpoTabal = document.querySelector("#info-tabla");
     cuerpoTabal.innerHTML = "";
-    this.datos.forEach((dato) => {
+
+    this.datos.data.forEach((dato) => {
       const { name, description, id } = dato;
       cuerpoTabal.innerHTML += /*html*/ `
           <tr>
           <th scope="row">${id}</th>
           <td>${name}</td>
           <td>${description}</td>
-          <td class="text-center"><a href="#" "><i class='bx bx-pencil icon-actions idHere' id="${id}"></i></a></td>
-          <td class="text-center"><i class='bx bx-trash-alt icon-actions'></i></td>
+          <td class="text-center"><i class='bx bx-pencil icon-actions editar' id="${id}"></i></td>
+          <td class="text-center"><i class='bx bx-trash-alt icon-actions eliminar' id="${id}"></i></td>
         </tr>
       `;
     });
@@ -142,34 +171,28 @@ export class GamaComponent extends HTMLElement {
 
   detectarId() {
     const cuerpoTabal = document.querySelector("#info-tabla");
-    cuerpoTabal.addEventListener("click", (e) => {
-      if (e.target.classList.contains("idHere")) {
-        e.preventDefault();
-        let id = e.target.id;
-        const objeto = this.buscarObjecto(id);
+    cuerpoTabal.addEventListener("click", async (e) => {
+      e.preventDefault();
+      const id = e.target.id;
+      if (e.target.classList.contains("editar")) {
+        const objeto = await this.buscarObjecto(id);
         poblarFormulario(objeto, this.formulario, this.modal);
+      } else if(e.target.classList.contains("eliminar")){
+        if(pedirConfirmacion("esta gama")){
+          await deleteData(id, this.endPoint)
+          alertaTemporal(this.alerta, "Eliminado correctacmente", "info");
+          this.tabla();
+        }
       } else {
         console.log("Este elemento no tiene la clase");
       }
     });
   }
 
-
-  buscarObjecto(id) {
-    let dato = "";
-    this.datos.forEach((d) => {
-      if (d.id == id) dato = d;
-    });
+  
+  async buscarObjecto(id) {
+    const dato = await getOneData(id, this.endPoint);
     return dato;
-  }
-
-  actualizarData(data) {
-    this.datos.forEach((d) => {
-      if (d.id == data.id) {
-        d.name = data.name;
-        d.description = data.description;
-      }
-    });
   }
 } //fin de la clase
 

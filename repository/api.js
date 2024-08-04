@@ -209,7 +209,7 @@ export async function getOneData(id, endpoint) {
       const data = await response.json();
       return data;
     } else if (response.status === 404) {
-      console.log("El servidor no pudo encontrar el contenido solicitado");
+      console.log("El servidor no pudo encontrar el contenido solicitado"+ response.errorData);
     } else {
       console.log(
         "El servidor ha encontrado una situación que no sabe cómo manejarla"
