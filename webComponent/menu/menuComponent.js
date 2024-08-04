@@ -22,7 +22,7 @@ export class MenuComponent extends HTMLElement {
           <i class="bx bx-chevron-right icon-right"></i
         ></a>
         <ul class="side-dropdown">
-          <li><a href="#" class="agregar">Listado</a></li>
+          <li><a href="#" class="listaProductos">Listado</a></li>
           <li><a href="#" class="gama">Gama producto</a></li>
           <li><a href="#" class="eliminar">Bajo Stock</a></li>
           <li><a href="#" class="editar">Filtrar por gama</a></li>
@@ -154,6 +154,8 @@ export class MenuComponent extends HTMLElement {
         main.innerHTML = `<customer-component></customer-component>`
       }else if(option === 'listaPagos'){
         main.innerHTML = `<payment-component></payment-component>`
+      }else if(option === 'listaProductos'){
+        main.innerHTML = `<product-component></product-component>`
       }
     })
   }
