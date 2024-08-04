@@ -8,3 +8,4 @@ import "/webComponent/employee/EmployeeComponent.js";
 import "/webComponent/customer/CustomerComponent.js";
 import "/webComponent/payment/PaymentComponent.js";
 import "/webComponent/product/ProductComponent.js";
+import "/webComponent/order/OrderComponent.js";

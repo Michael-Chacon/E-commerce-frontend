@@ -45,7 +45,7 @@ export class MenuComponent extends HTMLElement {
         <i class="bx bx-chevron-right icon-right"></i
       ></a>
       <ul class="side-dropdown">
-        <li><a href="#" class="persona agregar">Listado</a></li>
+        <li><a href="#" class="listaPedidos">Listado</a></li>
         <li><a href="#" class="persona editar">Por estado</a></li>
         <li><a href="#" class="persona eliminar">Por Rango de Fechas</a></li>
       </ul>
@@ -135,29 +135,31 @@ export class MenuComponent extends HTMLElement {
 
     const padre = document.querySelector(".side-menu");
     const main = document.querySelector(".main");
-    padre.addEventListener("click",  (e) => {
+    padre.addEventListener("click", (e) => {
       const option = e.target.classList[0];
-      console.log(option)
-      if(option === 'gama'){
-        main.innerHTML = `<gama-component></gama-component>`
-      }else if(option === 'status'){
-        main.innerHTML = `<status-component></status-component>`
-      }else if(option === 'metodoPago'){
-        main.innerHTML = `<payment-method-component></payment-method-component>`
-      }else if(option === 'ciudad'){
-        main.innerHTML = `<city-component></city-component>`
-      }else if(option === 'listaOfincinas'){
-        main.innerHTML = `<office-component></office-component>`
-      }else if(option === 'listaEmpleados'){
-        main.innerHTML = `<employee-component></employee-component>`
-      }else if(option === 'listarClient'){
-        main.innerHTML = `<customer-component></customer-component>`
-      }else if(option === 'listaPagos'){
-        main.innerHTML = `<payment-component></payment-component>`
-      }else if(option === 'listaProductos'){
-        main.innerHTML = `<product-component></product-component>`
+      console.log(option);
+      if (option === "gama") {
+        main.innerHTML = `<gama-component></gama-component>`;
+      } else if (option === "status") {
+        main.innerHTML = `<status-component></status-component>`;
+      } else if (option === "metodoPago") {
+        main.innerHTML = `<payment-method-component></payment-method-component>`;
+      } else if (option === "ciudad") {
+        main.innerHTML = `<city-component></city-component>`;
+      } else if (option === "listaOfincinas") {
+        main.innerHTML = `<office-component></office-component>`;
+      } else if (option === "listaEmpleados") {
+        main.innerHTML = `<employee-component></employee-component>`;
+      } else if (option === "listarClient") {
+        main.innerHTML = `<customer-component></customer-component>`;
+      } else if (option === "listaPagos") {
+        main.innerHTML = `<payment-component></payment-component>`;
+      } else if (option === "listaProductos") {
+        main.innerHTML = `<product-component></product-component>`;
+      } else if (option === "listaPedidos") {
+        main.innerHTML = `<order-component></order-component>`;
       }
-    })
+    });
   }
 }
 
