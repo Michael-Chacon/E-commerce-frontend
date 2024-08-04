@@ -47,6 +47,7 @@ export class OfficeComponent extends HTMLElement {
                     <th scope="col">Id city</th>
                     <th scope="col">Address 1</th>
                     <th scope="col">Address 2</th>
+                    <th scope="col">Tel</th>
                     <th colspan="2"></th>
                     </tr>
                 </thead>
@@ -102,6 +103,15 @@ export class OfficeComponent extends HTMLElement {
       "input"
     );
 
+    createImput(
+      this.formulario,
+      "",
+      "number",
+      "number",
+      "Address 2",
+      "input"
+    );
+
     createSelect(
       this.formulario,
       "",
@@ -153,13 +163,14 @@ export class OfficeComponent extends HTMLElement {
     const cuerpoTabal = document.querySelector("#info-tabla");
     cuerpoTabal.innerHTML = "";
     this.datos.forEach((dato) => {
-      const { address_line1, address_line2, city_code_d, id } = dato;
+      const { address_line1, address_line2, city_code_d, id, number } = dato;
       cuerpoTabal.innerHTML += /*html*/ `
               <tr>
               <th scope="row">${id}</th>
               <td>${city_code_d}</td>
               <td>${address_line1}</td>
               <td>${address_line2}</td>
+              <td>${number}</td>
               <td class="text-center"><a href="#" "><i class='bx bx-pencil icon-actions idHere' id="${id}"></i></a></td>
               <td class="text-center"><i class='bx bx-trash-alt icon-actions'></i></td>
             </tr>
@@ -195,6 +206,7 @@ export class OfficeComponent extends HTMLElement {
         d.address_line1 = data.address_line1;
         d.address_line2 = data.address_line2;
         d.city_code_d = data.city_code_d;
+        d.number = data.number;
       }
     });
   }
