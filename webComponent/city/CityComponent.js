@@ -16,7 +16,7 @@ import {
 } from "../../repository/api.js";
 
 export class CityComponent extends HTMLElement {
-  endPoint = "ciudad";
+  endPoint = "api/cities";
 
   constructor() {
     super();

@@ -15,7 +15,7 @@ import {
 } from "../../repository/api.js";
 
 export class PaymentMethodComponent extends HTMLElement {
-  endPoint = "metodo_pago";
+  endPoint = "api/payment-methods";
 
   constructor() {
     super();
@@ -88,7 +88,7 @@ export class PaymentMethodComponent extends HTMLElement {
       this.formulario,
       "",
       "text",
-      "method_name",
+      "methodName",
       "Name of payment method",
       "input"
     );
@@ -140,11 +140,11 @@ export class PaymentMethodComponent extends HTMLElement {
     const cuerpoTabal = document.querySelector("#info-tabla");
     cuerpoTabal.innerHTML = "";
     this.datos.data.forEach((dato) => {
-      const { method_name, id } = dato;
+      const { methodName, id } = dato;
       cuerpoTabal.innerHTML += /*html*/ `
               <tr>
               <th scope="row">${id}</th>
-              <td>${method_name}</td>
+              <td>${methodName}</td>
               <td class="text-center"><a href="#" "><i class='bx bx-pencil icon-actions editar' id="${id}"></i></a></td>
               <td class="text-center"><i class='bx bx-trash-alt icon-actions eliminar' id="${id}"></i></td>
             </tr>
