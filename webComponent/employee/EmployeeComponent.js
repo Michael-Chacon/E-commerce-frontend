@@ -1,35 +1,39 @@
 import {
-    createImput,
-    manipularModal,
-    poblarFormulario,
-    alertaGenerica,
-    alertaTemporal,
-    createSelect,
-  } from "../../js/utils/form.js";
-  
-  export class EmployeeComponent extends HTMLElement {
-    constructor() {
-      super();
-      this.render();
-      this.formulario = document.querySelector("#formGama");
-      this.modal = document.querySelector("#modal");
-      this.datos = [];
-      this.oficinas = [
-        { id: 1, name: "San Gil" },
-        { id: 2, name: "Bogotá" },
-        { id: 3, name: "Medellín" },
-        { id: 4, name: "Cartagena" },
-        { id: 5, name: "Cali" },
-      ];
-      this.llenarFormulario();
-      this.registrar();
-      this.detectarId();
-      this.tabla();
-      this.alerta = document.querySelector(".alerta");
-    }
-  
-    render() {
-      this.innerHTML = `
+  createImput,
+  manipularModal,
+  poblarFormulario,
+  alertaGenerica,
+  alertaTemporal,
+  createSelect,
+  pedirConfirmacion,
+} from "../../js/utils/form.js";
+
+import {
+  deleteData,
+  getData,
+  getOneData,
+  postData,
+  updateData,
+} from "../../repository/api.js";
+
+export class EmployeeComponent extends HTMLElement {
+  endPoint = "empleado";
+  constructor() {
+    super();
+    this.render();
+    this.formulario = document.querySelector("#formGama");
+    this.modal = document.querySelector("#modal");
+    this.datos = [];
+    this.oficinas = [];
+    this.llenarFormulario();
+    this.registrar();
+    this.detectarId();
+    this.tabla();
+    this.alerta = document.querySelector(".alerta");
+  }
+
+  render() {
+    this.innerHTML = `
           <div class="container " style="margin-top: 20px;">
           <div class="row padre">
               <div class="col-12 hija2 shadow p-3 mb-5 bg-body rounded">
@@ -74,102 +78,93 @@ import {
               </div>
           </div>
           `;
-    }
-  
-    // --------------------------- metodos ----------------------------------------------------
-    // export function createImput(elementoPadre, iddinamico, tipo, nombre, subtexto, etiqueta, hidden)
-  
-    llenarFormulario() {
-      createImput(this.formulario, "", "text", "id", "", "input", true);
-  
-      createImput(
-        this.formulario,
-        "",
-        "text",
-        "first_name",
-        "Name",
-        "input"
-      );
-  
-      createImput(
-        this.formulario,
-        "",
-        "text",
-        "last_name1",
-        "First last name",
-        "input"
-      );
+  }
 
-      createImput(
-        this.formulario,
-        "",
-        "text",
-        "last_name2",
-        "Second last name",
-        "input"
-      );
+  // --------------------------- metodos ----------------------------------------------------
+  // export function createImput(elementoPadre, iddinamico, tipo, nombre, subtexto, etiqueta, hidden)
 
-      createImput(
-        this.formulario,
-        "",
-        "email",
-        "email",
-        "Email",
-        "input"
-      );
-  
-      createSelect(
-        this.formulario,
-        "",
-        "office_code",
-        "Office code",
-        this.oficinas
-      );
-  
-      const botones = document.createElement("div");
-      botones.innerHTML = `
+  async llenarFormulario() {
+    this.oficinas = await getData("oficina");
+    createImput(this.formulario, "", "text", "id", "", "input", true);
+
+    createImput(this.formulario, "", "text", "first_name", "Name", "input");
+
+    createImput(
+      this.formulario,
+      "",
+      "text",
+      "last_name1",
+      "First last name",
+      "input"
+    );
+
+    createImput(
+      this.formulario,
+      "",
+      "text",
+      "last_name2",
+      "Second last name",
+      "input"
+    );
+
+    createImput(this.formulario, "", "email", "email", "Email", "input");
+
+    createSelect(
+      this.formulario,
+      "",
+      "office_code",
+      "Office code",
+      this.oficinas.data
+    );
+
+    const botones = document.createElement("div");
+    botones.innerHTML = `
             <div class="modal-footer">
               <button type="button" class="btn btn-outline-danger" data-bs-dismiss="modal">Cancelar</button>
               <button type="submit" class="btn btn-outline-dark" id="btnRegistrar">Registrar</button>
             </div>
           `;
-      this.formulario.appendChild(botones);
-    }
-  
-    registrar() {
-      this.formulario.addEventListener("submit", (e) => {
-        e.preventDefault();
-  
-        const inputs = new FormData(this.formulario);
-        const data = Object.fromEntries(inputs);
-  
-        if (data.id !== "") {
-          this.actualizarData(data);
-        } else if (data.id === "") {
-          data.id = this.datos.length + 1;
-          this.datos.push(data);
-        } else {
-          console.log("Error metodo registrar");
-        }
-        manipularModal(this.modal, "hide");
-        alertaTemporal(this.alerta, "Successful process", "success");
-        this.tabla();
-        this.formulario.reset();
-      });
-    }
-  
-    tabla() {
-      const contenedor = document.querySelector(".contenedor");
-      if (this.datos.length === 0) {
-        alertaGenerica("No registered", contenedor);
+    this.formulario.appendChild(botones);
+  }
+
+  registrar() {
+    this.formulario.addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      const inputs = new FormData(this.formulario);
+      const data = Object.fromEntries(inputs);
+
+      if (data.id !== "") {
+        const respuesta = await updateData(data, this.endPoint, data.id);
+        console.log(respuesta.status);
+      } else if (data.id === "") {
+        data.id = parseInt(this.datos.data.length + 1);
+        const respuesta = await postData(data, this.endPoint);
+        console.log(respuesta.status);
       } else {
-        contenedor.innerHTML = "";
+        console.log("Error metodo registrar");
       }
-      const cuerpoTabal = document.querySelector("#info-tabla");
-      cuerpoTabal.innerHTML = "";
-      this.datos.forEach((dato) => {
-        const { email, first_name, id, last_name1, last_name2, office_code } = dato;
-        cuerpoTabal.innerHTML += /*html*/ `
+      manipularModal(this.modal, "hide");
+      alertaTemporal(this.alerta, "Successful process", "success");
+      this.tabla();
+      this.formulario.reset();
+    });
+  }
+
+  async tabla() {
+    const contenedor = document.querySelector(".contenedor");
+    this.datos = await getData(this.endPoint, "");
+    if (this.datos.data.length === 0) {
+      alertaGenerica("No registered", contenedor);
+    } else {
+      contenedor.innerHTML = "";
+    }
+    const cuerpoTabal = document.querySelector("#info-tabla");
+    cuerpoTabal.innerHTML = "";
+    this.datos.data.forEach((dato) => {
+      const { email, first_name, id, last_name1, last_name2, office_code } =
+        dato;
+      cuerpoTabal.innerHTML += /*html*/ `
                 <tr>
                 <th scope="row">${id}</th>
                 <td>${first_name}</td>
@@ -177,46 +172,36 @@ import {
                 <td>${last_name2}</td>
                 <td>${email}</td>
                 <td>${office_code}</td>
-                <td class="text-center"><a href="#" "><i class='bx bx-pencil icon-actions idHere' id="${id}"></i></a></td>
-                <td class="text-center"><i class='bx bx-trash-alt icon-actions'></i></td>
+                <td class="text-center"><a href="#" "><i class='bx bx-pencil icon-actions editar' id="${id}"></i></a></td>
+                <td class="text-center"><i class='bx bx-trash-alt icon-actions eliminar' id="${id}"></i></td>
               </tr>
             `;
-      });
-    }
-  
-    detectarId() {
-      const cuerpoTabal = document.querySelector("#info-tabla");
-      cuerpoTabal.addEventListener("click", (e) => {
-        if (e.target.classList.contains("idHere")) {
-          e.preventDefault();
-          let id = e.target.id;
-          const objeto = this.buscarObjecto(id);
-          poblarFormulario(objeto, this.formulario, this.modal);
-        } else {
-          console.log("Este elemento no tiene la clase");
-        }
-      });
-    }
-  
-    buscarObjecto(id) {
-      let dato = "";
-      this.datos.forEach((d) => {
-        if (d.id == id) dato = d;
-      });
-      return dato;
-    }
-  
-    actualizarData(data) {
-      this.datos.forEach((d) => {
-        if (d.id == data.id) {
-          d.first_name = data.first_name;
-          d.last_name1 = data.last_name1;
-          d.last_name2 = data.last_name2;
-          d.email = data.email;
-          d.office_code = data.office_code;
-        }
-      });
-    }
+    });
   }
-  customElements.define("employee-component", EmployeeComponent);
-  
+
+  detectarId() {
+    const cuerpoTabal = document.querySelector("#info-tabla");
+    cuerpoTabal.addEventListener("click", async (e) => {
+      e.preventDefault();
+      const id = e.target.id;
+      if (e.target.classList.contains("editar")) {
+        const objeto = await this.buscarObjecto(id);
+        poblarFormulario(objeto, this.formulario, this.modal);
+      } else if (e.target.classList.contains("eliminar")) {
+        if (pedirConfirmacion("este empleado")) {
+          await deleteData(id, this.endPoint);
+          alertaTemporal(this.alerta, "Eliminado correctacmente", "info");
+          this.tabla();
+        }
+      } else {
+        console.log("Este elemento no tiene la clase");
+      }
+    });
+  }
+
+  async buscarObjecto(id) {
+    const dato = await getOneData(id, this.endPoint);
+    return dato;
+  }
+}
+customElements.define("employee-component", EmployeeComponent);
