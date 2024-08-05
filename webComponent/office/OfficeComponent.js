@@ -5,9 +5,20 @@ import {
   alertaGenerica,
   alertaTemporal,
   createSelect,
+  pedirConfirmacion,
 } from "../../js/utils/form.js";
 
+import {
+  deleteData,
+  getData,
+  getOneData,
+  postData,
+  updateData,
+} from "../../repository/api.js";
+
 export class OfficeComponent extends HTMLElement {
+  endPoint = "office";
+
   constructor() {
     super();
     this.render();
@@ -103,14 +114,7 @@ export class OfficeComponent extends HTMLElement {
       "input"
     );
 
-    createImput(
-      this.formulario,
-      "",
-      "number",
-      "number",
-      "Address 2",
-      "input"
-    );
+    createImput(this.formulario, "", "number", "number", "Phone", "input");
 
     createSelect(
       this.formulario,
@@ -131,17 +135,19 @@ export class OfficeComponent extends HTMLElement {
   }
 
   registrar() {
-    this.formulario.addEventListener("submit", (e) => {
+    this.formulario.addEventListener("submit", async (e) => {
       e.preventDefault();
 
       const inputs = new FormData(this.formulario);
       const data = Object.fromEntries(inputs);
 
       if (data.id !== "") {
-        this.actualizarData(data);
+        const respuesta = await updateData(data, this.endPoint, data.id);
+        console.log(respuesta.status);
       } else if (data.id === "") {
-        data.id = this.datos.length + 1;
-        this.datos.push(data);
+        data.id = parseInt(this.datos.data.length + 1);
+        const respuesta = await postData(data, this.endPoint);
+        console.log(respuesta.status);
       } else {
         console.log("Error metodo registrar");
       }
@@ -153,16 +159,17 @@ export class OfficeComponent extends HTMLElement {
     });
   }
 
-  tabla() {
+  async tabla() {
     const contenedor = document.querySelector(".contenedor");
-    if (this.datos.length === 0) {
+    this.datos = await getData(this.endPoint, "");
+    if (this.datos.data.length === 0) {
       alertaGenerica("No registered", contenedor);
     } else {
       contenedor.innerHTML = "";
     }
     const cuerpoTabal = document.querySelector("#info-tabla");
     cuerpoTabal.innerHTML = "";
-    this.datos.forEach((dato) => {
+    this.datos.data.forEach((dato) => {
       const { address_line1, address_line2, city_code_d, id, number } = dato;
       cuerpoTabal.innerHTML += /*html*/ `
               <tr>
@@ -171,8 +178,8 @@ export class OfficeComponent extends HTMLElement {
               <td>${address_line1}</td>
               <td>${address_line2}</td>
               <td>${number}</td>
-              <td class="text-center"><a href="#" "><i class='bx bx-pencil icon-actions idHere' id="${id}"></i></a></td>
-              <td class="text-center"><i class='bx bx-trash-alt icon-actions'></i></td>
+              <td class="text-center"><a href="#" "><i class='bx bx-pencil icon-actions editar' id="${id}"></i></a></td>
+              <td class="text-center"><i class='bx bx-trash-alt icon-actions eliminar' id="${id}"></i></td>
             </tr>
           `;
     });
@@ -180,35 +187,27 @@ export class OfficeComponent extends HTMLElement {
 
   detectarId() {
     const cuerpoTabal = document.querySelector("#info-tabla");
-    cuerpoTabal.addEventListener("click", (e) => {
-      if (e.target.classList.contains("idHere")) {
-        e.preventDefault();
-        let id = e.target.id;
-        const objeto = this.buscarObjecto(id);
+    cuerpoTabal.addEventListener("click", async (e) => {
+      e.preventDefault();
+      const id = e.target.id;
+      if (e.target.classList.contains("editar")) {
+        const objeto = await this.buscarObjecto(id);
         poblarFormulario(objeto, this.formulario, this.modal);
+      } else if (e.target.classList.contains("eliminar")) {
+        if (pedirConfirmacion("esta oficina")) {
+          await deleteData(id, this.endPoint);
+          alertaTemporal(this.alerta, "Eliminado correctacmente", "info");
+          this.tabla();
+        }
       } else {
         console.log("Este elemento no tiene la clase");
       }
     });
   }
 
-  buscarObjecto(id) {
-    let dato = "";
-    this.datos.forEach((d) => {
-      if (d.id == id) dato = d;
-    });
+  async buscarObjecto(id) {
+    const dato = await getOneData(id, this.endPoint);
     return dato;
-  }
-
-  actualizarData(data) {
-    this.datos.forEach((d) => {
-      if (d.id == data.id) {
-        d.address_line1 = data.address_line1;
-        d.address_line2 = data.address_line2;
-        d.city_code_d = data.city_code_d;
-        d.number = data.number;
-      }
-    });
   }
 }
 customElements.define("office-component", OfficeComponent);
