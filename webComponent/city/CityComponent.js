@@ -125,7 +125,7 @@ export class CityComponent extends HTMLElement {
   async tabla() {
     const contenedor = document.querySelector(".contenedor");
     this.datos = await getData(this.endPoint, "");
-    if (this.datos.length === 0) {
+    if (this.datos.data.length === 0) {
       alertaGenerica("No registered", contenedor);
     } else {
       contenedor.innerHTML = "";

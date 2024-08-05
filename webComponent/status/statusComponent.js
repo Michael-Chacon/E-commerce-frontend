@@ -1,21 +1,36 @@
-import { createImput, manipularModal, poblarFormulario, alertaGenerica, alertaTemporal } from "../../js/utils/form.js";
+import {
+  createImput,
+  manipularModal,
+  poblarFormulario,
+  alertaGenerica,
+  alertaTemporal,
+  pedirConfirmacion,
+} from "../../js/utils/form.js";
+import {
+  deleteData,
+  getData,
+  getOneData,
+  postData,
+  updateData,
+} from "../../repository/api.js";
 
-export class StatusComponent extends HTMLElement{
-    constructor(){
-        super();
-        this.render();
-        this.formulario = document.querySelector("#formGama");
-        this.modal = document.querySelector("#modal");
-        this.datos = [];
-        this.llenarFormulario();
-        this.registrar();
-        this.detectarId();
-        this.tabla();
-        this.alerta = document.querySelector(".alerta")
-    }
+export class StatusComponent extends HTMLElement {
+  endPoint = "estado";
+  constructor() {
+    super();
+    this.render();
+    this.formulario = document.querySelector("#formGama");
+    this.modal = document.querySelector("#modal");
+    this.datos = [];
+    this.llenarFormulario();
+    this.registrar();
+    this.detectarId();
+    this.tabla();
+    this.alerta = document.querySelector(".alerta");
+  }
 
-    render(){
-        this.innerHTML = `
+  render() {
+    this.innerHTML = `
         <div class="container " style="margin-top: 20px;">
         <div class="row padre">
             <div class="col">
@@ -60,108 +75,104 @@ export class StatusComponent extends HTMLElement{
             </div>
         </div>
         `;
-    }
+  }
 
-    // --------------------------- metodos ----------------------------------------------------
-    // export function createImput(elementoPadre, iddinamico, tipo, nombre, subtexto, etiqueta, hidden)
+  // --------------------------- metodos ----------------------------------------------------
+  // export function createImput(elementoPadre, iddinamico, tipo, nombre, subtexto, etiqueta, hidden)
 
-    llenarFormulario() {
-        createImput(this.formulario, "", "text", "id", "", "input", true);
-    
-        createImput(
-          this.formulario,
-          "",
-          "text",
-          "name",
-          "status of one order",
-          "input"
-        );
+  llenarFormulario() {
+    createImput(this.formulario, "", "text", "id", "", "input", true);
 
-    
-        const botones = document.createElement("div");
-        botones.innerHTML = `
+    createImput(
+      this.formulario,
+      "",
+      "text",
+      "state_name",
+      "status of one order",
+      "input"
+    );
+
+    const botones = document.createElement("div");
+    botones.innerHTML = `
           <div class="modal-footer">
             <button type="button" class="btn btn-outline-danger" data-bs-dismiss="modal">Cancelar</button>
             <button type="submit" class="btn btn-outline-dark" id="btnRegistrar">Registrar</button>
           </div>
         `;
-        this.formulario.appendChild(botones);
+    this.formulario.appendChild(botones);
+  }
+
+  registrar() {
+    this.formulario.addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      const inputs = new FormData(this.formulario);
+      const data = Object.fromEntries(inputs);
+
+      if (data.id !== "") {
+        const respuesta = await updateData(data, this.endPoint, data.id);
+        console.log(respuesta.status);
+      } else if (data.id === "") {
+        data.id = parseInt(this.datos.data.length + 1);
+        const respuesta = await postData(data, this.endPoint);
+        console.log(respuesta.status);
+      } else {
+        console.log("Error metodo registrar");
       }
 
-    registrar() {
-        this.formulario.addEventListener("submit", (e) => {
-          e.preventDefault();
-    
-          const inputs = new FormData(this.formulario);
-          const data = Object.fromEntries(inputs); 
-    
-          if (data.id !== '') {
-            this.actualizarData(data);
-          } else if (data.id === '') {
-            data.id = this.datos.length + 1;
-            this.datos.push(data);
-          } else {
-            console.log("Error metodo registrar");
-          }
-          
-          manipularModal(this.modal, "hide");
-          alertaTemporal(this.alerta, "Successful process", 'success')
-          this.tabla();
-          this.formulario.reset();
-        });
-      }
-    
-    
-      tabla() {
-        const contenedor = document.querySelector(".contenedor")
-        if(this.datos.length === 0){
-          alertaGenerica('No registered status ',contenedor)
-        }else{contenedor.innerHTML = ""}
-        const cuerpoTabal = document.querySelector("#info-tabla");
-        cuerpoTabal.innerHTML = "";
-        this.datos.forEach((dato) => {
-          const { name, id } = dato;
-          cuerpoTabal.innerHTML += /*html*/ `
+      manipularModal(this.modal, "hide");
+      alertaTemporal(this.alerta, "Successful process", "success");
+      this.tabla();
+      this.formulario.reset();
+    });
+  }
+
+  async tabla() {
+    const contenedor = document.querySelector(".contenedor");
+    this.datos = await getData(this.endPoint, "");
+    if (this.datos.data.length === 0) {
+      alertaGenerica("No registered status ", contenedor);
+    } else {
+      contenedor.innerHTML = "";
+    }
+    const cuerpoTabal = document.querySelector("#info-tabla");
+    cuerpoTabal.innerHTML = "";
+    this.datos.data.forEach((dato) => {
+      const { state_name, id } = dato;
+      cuerpoTabal.innerHTML += /*html*/ `
               <tr>
               <th scope="row">${id}</th>
-              <td>${name}</td>
-              <td class="text-center"><a href="#" "><i class='bx bx-pencil icon-actions idHere' id="${id}"></i></a></td>
-              <td class="text-center"><i class='bx bx-trash-alt icon-actions'></i></td>
+              <td>${state_name}</td>
+              <td class="text-center"><a href="#" "><i class='bx bx-pencil icon-actions editar' id="${id}"></i></a></td>
+              <td class="text-center"><i class='bx bx-trash-alt icon-actions eliminar' id="${id}"></i></td>
             </tr>
           `;
-        });
+    });
+  }
+
+  detectarId() {
+    const cuerpoTabal = document.querySelector("#info-tabla");
+    cuerpoTabal.addEventListener("click", async (e) => {
+      e.preventDefault();
+      const id = e.target.id;
+      if (e.target.classList.contains("editar")) {
+        const objeto = await this.buscarObjecto(id);
+        poblarFormulario(objeto, this.formulario, this.modal);
+      } else if (e.target.classList.contains("eliminar")) {
+        if (pedirConfirmacion("esta estado")) {
+          await deleteData(id, this.endPoint);
+          alertaTemporal(this.alerta, "Eliminado correctacmente", "info");
+          this.tabla();
+        }
+      } else {
+        console.log("Este elemento no tiene la clase");
       }
-    
-    
-      detectarId() {
-        const cuerpoTabal = document.querySelector("#info-tabla");
-        cuerpoTabal.addEventListener("click", (e) => {
-          if (e.target.classList.contains("idHere")) {
-            e.preventDefault();
-            let id = e.target.id;
-            const objeto = this.buscarObjecto(id);
-            poblarFormulario(objeto, this.formulario, this.modal);
-          } else {
-            console.log("Este elemento no tiene la clase");
-          }
-        });
-      }
-    
-    
-      buscarObjecto(id) {
-        let dato = "";
-        this.datos.forEach((d) => {
-          if (d.id == id) dato = d;
-        });
-        return dato;
-      }
-    
-      actualizarData(data) {
-        this.datos.forEach((d) => {
-          if (d.id == data.id) {
-            d.name = data.name;
-          }
-        });
-      }
+    });
+  }
+
+  async buscarObjecto(id) {
+    const dato = await getOneData(id, this.endPoint);
+    return dato;
+  }
 }
-customElements.define('status-component', StatusComponent)
+customElements.define("status-component", StatusComponent);
