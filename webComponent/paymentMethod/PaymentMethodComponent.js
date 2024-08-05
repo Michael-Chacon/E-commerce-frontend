@@ -114,7 +114,6 @@ export class PaymentMethodComponent extends HTMLElement {
         const respuesta = await updateData(data, this.endPoint, data.id);
         console.log(respuesta.status);
       } else if (data.id === "") {
-        data.id = parseInt(this.datos.data.length + 1);
         const respuesta = await postData(data, this.endPoint);
         console.log(respuesta.status);
       } else {

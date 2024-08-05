@@ -16,7 +16,7 @@ import {
 } from "../../repository/api.js";
 
 export class StatusComponent extends HTMLElement {
-  endPoint = "estado";
+  endPoint = "api/status";
   constructor() {
     super();
     this.render();
@@ -88,7 +88,7 @@ export class StatusComponent extends HTMLElement {
       this.formulario,
       "",
       "text",
-      "state_name",
+      "statusName",
       "status of one order",
       "input"
     );
@@ -111,10 +111,9 @@ export class StatusComponent extends HTMLElement {
       const data = Object.fromEntries(inputs);
 
       if (data.id !== "") {
-          const respuesta = await updateData(data, this.endPoint, data.id);
-          console.log(respuesta.status);
+        const respuesta = await updateData(data, this.endPoint, data.id);
+        console.log(respuesta.status);
       } else if (data.id === "") {
-        data.id = parseInt(this.datos.data.length + 1);
         const respuesta = await postData(data, this.endPoint);
         console.log(respuesta.status);
       } else {
@@ -128,7 +127,7 @@ export class StatusComponent extends HTMLElement {
     });
   }
 
-  async tabla() { 
+  async tabla() {
     const contenedor = document.querySelector(".contenedor");
     this.datos = await getData(this.endPoint, "");
     if (this.datos.data.length === 0) {
@@ -139,11 +138,11 @@ export class StatusComponent extends HTMLElement {
     const cuerpoTabal = document.querySelector("#info-tabla");
     cuerpoTabal.innerHTML = "";
     this.datos.data.forEach((dato) => {
-      const { state_name, id } = dato;
+      const { statusName, id } = dato;
       cuerpoTabal.innerHTML += /*html*/ `
               <tr>
               <th scope="row">${id}</th>
-              <td>${state_name}</td>
+              <td>${statusName}</td>
               <td class="text-center"><a href="#" "><i class='bx bx-pencil icon-actions editar' id="${id}"></i></a></td>
               <td class="text-center"><i class='bx bx-trash-alt icon-actions eliminar' id="${id}"></i></td>
             </tr>
@@ -158,6 +157,7 @@ export class StatusComponent extends HTMLElement {
       const id = e.target.id;
       if (e.target.classList.contains("editar")) {
         const objeto = await this.buscarObjecto(id);
+        console.log(objeto)
         poblarFormulario(objeto, this.formulario, this.modal);
       } else if (e.target.classList.contains("eliminar")) {
         if (pedirConfirmacion("este estado")) {
