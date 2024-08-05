@@ -17,11 +17,13 @@ import {
 } from "../../repository/api.js";
 
 export class ProductComponent extends HTMLElement {
-  endPoint = "producto";
+  endPoint = "api/products";
   constructor() {
     super();
     this.render();
     this.formulario = document.querySelector("#formGama");
+    this.filtroGama = document.querySelector("#gamaProducto");
+    this.filtroStock = document.querySelector("#stockProducto");
     this.modal = document.querySelector("#modal");
     this.datos = [];
     this.gama = [];
@@ -38,8 +40,20 @@ export class ProductComponent extends HTMLElement {
           <div class="row padre">
               <div class="col-12 hija2 shadow p-3 mb-5 bg-body rounded">
               <div class="alerta"></div>
-              <button type="button" class="btn btn-outline-dark"  data-bs-toggle="modal" data-bs-target="#modal">
-                  Add product
+                  <button type="button" class="btn btn-outline-dark"  data-bs-toggle="modal" data-bs-target="#modal">
+                    Add product
+                  </button>
+
+                  <button type="button" class="btn btn-outline-secondary btn-sm" data-bs-toggle="modal" data-bs-target="#filtroGama">
+                    Filtrar por gama
+                  </button>
+
+                  <button type="button" class="btn btn-outline-success btn-sm" data-bs-toggle="modal" data-bs-target="#filtroStock">
+                    Filtrar por Bajo Stock
+                  </button>
+
+                  <button type="button" class="btn btn-outline-danger btn-sm">
+                    Mostrar todo
                   </button>
                   <hr>
                   <table class="table table-bordered">
@@ -59,8 +73,7 @@ export class ProductComponent extends HTMLElement {
                   <div class="contenedor">
                   </div>
               </div>
-          </div>
-          <!-- Button trigger modal -->  
+          </div> 
           <!-- Modal -->
           <div class="modal fade" id="modal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
               <div class="modal-dialog">
@@ -76,6 +89,36 @@ export class ProductComponent extends HTMLElement {
               </div>
               </div>
           </div>
+          <!-- Modal filtro por gama -->
+        <div class="modal fade " id="filtroGama" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+          <div class="modal-dialog ">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Consultar roductos por ama</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+              </div>
+              <div class="modal-body">
+                <form id="gamaProducto">
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- Modal filtro por bajo stock -->
+        <div class="modal fade" id="filtroStock" data-bs-backdrop="static" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+          <div class="modal-dialog">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Consultar productos con bajo stock</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+              </div>
+              <div class="modal-body">
+                <form id="stockProducto">
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
           `;
   }
 
@@ -83,7 +126,10 @@ export class ProductComponent extends HTMLElement {
   // export function createImput(elementoPadre, iddinamico, tipo, nombre, subtexto, etiqueta, hidden)
 
   async llenarFormulario() {
-    this.gama = await getData("gama_producto")
+    this.gama = await getData("api/productRanges")
+    createSelect(this.filtroGama,"", "rangeCode", "", this.gama.data)
+    createImput(this.filtroStock, "", "number", "stockQuantity", "Filtrar por esta cantidad", "input", false)
+
     createImput(this.formulario, "", "text", "id", "", "input", true);
 
     createImput(this.formulario, "", "text", "name", "Name", "input");
@@ -92,7 +138,7 @@ export class ProductComponent extends HTMLElement {
       this.formulario,
       "",
       "number",
-      "stock_quantity",
+      "stockQuantity",
       "Amount",
       "input"
     );
@@ -101,7 +147,7 @@ export class ProductComponent extends HTMLElement {
       this.formulario,
       "",
       "number",
-      "sale_price",
+      "salePrice",
       "Second last name",
       "input"
     );
@@ -110,7 +156,7 @@ export class ProductComponent extends HTMLElement {
       this.formulario,
       "",
       "text",
-      "product_description",
+      "productDescription",
       "Description",
       "textarea"
     );
@@ -124,7 +170,7 @@ export class ProductComponent extends HTMLElement {
       "input"
     );
 
-    createSelect(this.formulario, "", "range_code", "Office code", this.gama.data);
+    createSelect(this.formulario, "", "rangeCode", "Office code", this.gama.data);
 
     const botones = document.createElement("div");
     botones.innerHTML = `
@@ -133,6 +179,24 @@ export class ProductComponent extends HTMLElement {
               <button type="submit" class="btn btn-outline-dark" id="btnRegistrar">Registrar</button>
             </div>
           `;
+
+    const botonesGama = document.createElement("div");
+    botonesGama.innerHTML = `
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+            <button type="submit" class="btn btn-primary">Filtrar</button>
+          </div>      
+          `;
+    const botonesstock = document.createElement("div");
+    botonesstock.innerHTML = `
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+            <button type="submit" class="btn btn-primary">Filtrar</button>
+          </div>      
+          `;
+
+    this.filtroGama.appendChild(botonesGama);
+    this.filtroStock.appendChild(botonesstock);
     this.formulario.appendChild(botones);
   }
 
@@ -142,12 +206,13 @@ export class ProductComponent extends HTMLElement {
 
       const inputs = new FormData(this.formulario);
       const data = Object.fromEntries(inputs);
-
+    
+      console.log(data)
+      data.rangeCode = {"id": parseInt(data.rangeCode)}
       if (data.id !== "") {
         const respuesta = await updateData(data, this.endPoint, data.id);
         console.log(respuesta.status);
       } else if (data.id === "") {
-        data.id = parseInt(this.datos.data.length + 1);
         const respuesta = await postData(data, this.endPoint);
         console.log(respuesta.status);
       } else {
@@ -163,7 +228,7 @@ export class ProductComponent extends HTMLElement {
   async tabla() {
     const contenedor = document.querySelector(".contenedor");
     this.datos = await getData(this.endPoint, "");
-
+    console.log(this.datos)
     if (this.datos.data.length === 0) {
       alertaGenerica("No registered status ", contenedor);
     } else {
@@ -172,14 +237,14 @@ export class ProductComponent extends HTMLElement {
     const cuerpoTabal = document.querySelector("#info-tabla");
     cuerpoTabal.innerHTML = "";
     this.datos.data.forEach((dato) => {
-      const { name, stock_quantity, id, sale_price, range_code } = dato;
+      const { name, stockQuantity, id, salePrice, rangeCode } = dato;
       cuerpoTabal.innerHTML += /*html*/ `
                 <tr>
                 <th scope="row">${id}</th>
                 <td>${name}</td>
-                <td>${stock_quantity}</td>
-                <td>$${sale_price}</td>
-                <td>${range_code}</td>
+                <td>${stockQuantity}</td>
+                <td>$${salePrice}</td>
+                <td>${rangeCode.name}</td>
                 <td class="text-center"><a href="#" "><i class='bx bx-pencil icon-actions editar' id="${id}"></i></a></td>
                 <td class="text-center"><i class='bx bx-trash-alt icon-actions eliminar' id="${id}"></i></td>
               </tr>

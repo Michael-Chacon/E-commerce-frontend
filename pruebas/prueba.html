@@ -79,7 +79,19 @@
           <div class="col-8 hija2 shadow p-3 mb-5 bg-body rounded">
             <button type="button" class="btn btn-outline-dark"  data-bs-toggle="modal" data-bs-target="#staticBackdrop">
                 Crear gama de producto
-              </button>
+            </button>
+
+            <button type="button" class="btn btn-outline-secondary btn-sm" data-bs-toggle="modal" data-bs-target="#filtroGama">
+              Filtrar por gama
+            </button>
+
+            <button type="button" class="btn btn-outline-success btn-sm" data-bs-toggle="modal" data-bs-target="#filtroStock">
+              Filtrar por Bajo Stock
+            </button>
+
+            <button type="button" class="btn btn-outline-danger btn-sm">
+              Mostrar todo
+            </button>
 
               <hr>
  
@@ -115,7 +127,6 @@
             3 of 3
           </div>
         </div>
-        <!-- Button trigger modal -->  
         <!-- Modal -->
         <div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
             <div class="modal-dialog">
@@ -142,6 +153,56 @@
                 </div>
             </div>
             </div>
+        </div>
+
+        <!-- Modal filtro por gama -->
+        <div class="modal fade " id="filtroGama" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+          <div class="modal-dialog ">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Consultar roductos por ama</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+              </div>
+              <div class="modal-body">
+                <form id="gamaProducto">
+                  <select class="form-select" aria-label="Default select example">
+                    <option selected>Open this select menu</option>
+                    <option value="1">One</option>
+                    <option value="2">Two</option>
+                    <option value="3">Three</option>
+                  </select>
+                  <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Filtrar</button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- Modal filtro por bajo stock -->
+        <div class="modal fade" id="filtroStock" data-bs-backdrop="static" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+          <div class="modal-dialog">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Consultar productos con bajo stock</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+              </div>
+              <div class="modal-body">
+                <form id="stockProducto">
+                  <div class="mb-3">
+                    <label for="exampleInputEmail1" class="form-label">Stock producto</label>
+                    <input type="number" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp">
+                    <div id="emailHelp" class="form-text">Escriba el stock maximo</div>
+                  </div>
+                  <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Filtrar</button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
         </div>
 </body>
 </html>

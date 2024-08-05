@@ -1,4 +1,5 @@
-const URL_BASE = "http://localhost:8080";
+  const URL_BASE = "http://localhost:8080";
+  // const URL_BASE = "http://127.0.0.1:5500";
 
 const headers = new Headers({
   "Content-Type": "application/json",
@@ -83,6 +84,7 @@ export async function getData(endpoint, embed = "") {
  */
 
 export async function postData(data, endpoint) {
+  console.log(data)
   try {
     const response = await fetch(`${URL_BASE}/${endpoint}`, {
       method: "POST",
