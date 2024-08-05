@@ -1,38 +1,41 @@
 import {
-    createImput,
-    manipularModal,
-    poblarFormulario,
-    alertaGenerica,
-    alertaTemporal,
-    createSelect,
-  } from "../../js/utils/form.js";
-  
-  export class PaymentComponent extends HTMLElement {
-    constructor(){
-      super();
-      this.render();
-      this.formulario = document.querySelector("#formGama");
-      this.modal = document.querySelector("#modal");
-      this.datos = [];
-      this.metodo = [
-        { id: 1, name: "Paypal" },
-        { id: 2, name: "Nequi" },
-        { id: 3, name: "Bitcoin" },
-      ];
-      this.cliente = [
-        { id: 1, name: "Briand" },
-        { id: 2, name: "Henry" },
-        { id: 3, name: "Diego" },
-      ];
-      this.llenarFormulario();
-      this.registrar();
-      this.detectarId();
-      this.tabla();
-      this.alerta = document.querySelector(".alerta");
-    }
-  
-    render() {
-      this.innerHTML = `
+  createImput,
+  manipularModal,
+  poblarFormulario,
+  alertaGenerica,
+  alertaTemporal,
+  createSelect,
+  pedirConfirmacion,
+} from "../../js/utils/form.js";
+
+import {
+  deleteData,
+  getData,
+  getOneData,
+  postData,
+  updateData,
+} from "../../repository/api.js";
+
+export class PaymentComponent extends HTMLElement {
+  endPoint = "pago";
+
+  constructor() {
+    super();
+    this.render();
+    this.formulario = document.querySelector("#formGama");
+    this.modal = document.querySelector("#modal");
+    this.datos = [];
+    this.metodo = [];
+    this.cliente = [];
+    this.llenarFormulario();
+    this.registrar();
+    this.detectarId();
+    this.tabla();
+    this.alerta = document.querySelector(".alerta");
+  }
+
+  render() {
+    this.innerHTML = `
           <div class="container " style="margin-top: 20px;">
           <div class="row padre">
               <div class="col">
@@ -79,138 +82,130 @@ import {
               </div>
           </div>
           `;
-    }
-  
-    // --------------------------- metodos ----------------------------------------------------
-    // export function createImput(elementoPadre, iddinamico, tipo, nombre, subtexto, etiqueta, hidden)
-  
-    llenarFormulario() {
-      createImput(this.formulario, "", "text", "id", "", "input", true);
+  }
 
-      createSelect(
-        this.formulario,
-        "",
-        "customer_code_pa",
-        "customer",
-        this.cliente
-      );
+  // --------------------------- metodos ----------------------------------------------------
+  // export function createImput(elementoPadre, iddinamico, tipo, nombre, subtexto, etiqueta, hidden)
 
-      createSelect(
-        this.formulario,
-        "",
-        "payment_method",
-        "Metodo",
-        this.metodo
-      );
+  async llenarFormulario() {
+    this.metodo = await getData("metodo_pago")
+    this.cliente = await getData("cliente")
 
-      createImput(
-        this.formulario,
-        "",
-        "number",
-        "total",
-        "Total payment",
-        "input"
-      );
-  
-      createImput(
-        this.formulario,
-        "",
-        "date",
-        "payment_date",
-        "Date of payment",
-        "input"
-      );
-  
-      const botones = document.createElement("div");
-      botones.innerHTML = `
+    createImput(this.formulario, "", "text", "id", "", "input", true);
+
+    createSelect(
+      this.formulario,
+      "",
+      "customer_code_pa",
+      "customer",
+      this.cliente.data
+    );
+
+    createSelect(this.formulario, "", "payment_method", "Metodo", this.metodo.data);
+
+    createImput(
+      this.formulario,
+      "",
+      "number",
+      "total",
+      "Total payment",
+      "input"
+    );
+
+    createImput(
+      this.formulario,
+      "",
+      "date",
+      "payment_date",
+      "Date of payment",
+      "input"
+    );
+
+    const botones = document.createElement("div");
+    botones.innerHTML = `
             <div class="modal-footer">
               <button type="button" class="btn btn-outline-danger" data-bs-dismiss="modal">Cancelar</button>
               <button type="submit" class="btn btn-outline-dark" id="btnRegistrar">Registrar</button>
             </div>
           `;
-      this.formulario.appendChild(botones);
-    }
-  
-    registrar() {
-      this.formulario.addEventListener("submit", (e) => {
-        e.preventDefault();
-  
-        const inputs = new FormData(this.formulario);
-        const data = Object.fromEntries(inputs);
-  
-        if (data.id !== "") {
-          this.actualizarData(data);
-        } else if (data.id === "") {
-          data.id = this.datos.length + 1;
-          this.datos.push(data);
-        } else {
-          console.log("Error metodo registrar");
-        }
-        
-        manipularModal(this.modal, "hide");
-        alertaTemporal(this.alerta, "Successful process", "success");
-        this.tabla();
-        this.formulario.reset();
-      });
-    }
-  
-    tabla() {
-      const contenedor = document.querySelector(".contenedor");
-      if (this.datos.length === 0) {
-        alertaGenerica("No registered payments ", contenedor);
+    this.formulario.appendChild(botones);
+  }
+
+  registrar() {
+    this.formulario.addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      const inputs = new FormData(this.formulario);
+      const data = Object.fromEntries(inputs);
+
+      if (data.id !== "") {
+        const respuesta = await updateData(data, this.endPoint, data.id);
+        console.log(respuesta.status);
+      } else if (data.id === "") {
+        data.id = parseInt(this.datos.data.length + 1);
+        const respuesta = await postData(data, this.endPoint);
+        console.log(respuesta.status);
       } else {
-        contenedor.innerHTML = "";
+        console.log("Error metodo registrar");
       }
-      const cuerpoTabal = document.querySelector("#info-tabla");
-      cuerpoTabal.innerHTML = "";
-      this.datos.forEach((dato) => {
-        const { payment_date, total, payment_method, id, customer_code_pa } = dato;
-        cuerpoTabal.innerHTML += /*html*/ `
+
+      manipularModal(this.modal, "hide");
+      alertaTemporal(this.alerta, "Successful process", "success");
+      this.tabla();
+      this.formulario.reset();
+    });
+  }
+
+  async tabla() {
+    const contenedor = document.querySelector(".contenedor");
+    this.datos = await getData(this.endPoint, "");
+    if (this.datos.data.length === 0) {
+      alertaGenerica("No registered payments ", contenedor);
+    } else {
+      contenedor.innerHTML = "";
+    }
+    const cuerpoTabal = document.querySelector("#info-tabla");
+    cuerpoTabal.innerHTML = "";
+    this.datos.data.forEach((dato) => {
+      const { payment_date, total, payment_method, id, customer_code_pa } =
+        dato;
+      cuerpoTabal.innerHTML += /*html*/ `
                 <tr>
                 <th scope="row">${id}</th>
                 <td>${customer_code_pa}</td>
                 <td>${total}</td>
                 <td>${payment_method}</td>
                 <td>${payment_date}</td>
-                <td class="text-center"><a href="#" "><i class='bx bx-pencil icon-actions idHere' id="${id}"></i></a></td>
-                <td class="text-center"><i class='bx bx-trash-alt icon-actions'></i></td>
+                <td class="text-center"><a href="#" "><i class='bx bx-pencil icon-actions editar' id="${id}"></i></a></td>
+                <td class="text-center"><i class='bx bx-trash-alt icon-actions eliminar' id="${id}"></i></td>
               </tr>
             `;
-      });
-    }
-  
-    detectarId() {
-      const cuerpoTabal = document.querySelector("#info-tabla");
-      cuerpoTabal.addEventListener("click", (e) => {
-        if (e.target.classList.contains("idHere")) {
-          e.preventDefault();
-          let id = e.target.id;
-          const objeto = this.buscarObjecto(id);
-          poblarFormulario(objeto, this.formulario, this.modal);
-        } else {
-          console.log("Este elemento no tiene la clase");
-        }
-      });
-    }
-  
-    buscarObjecto(id) {
-      let dato = "";
-      this.datos.forEach((d) => {
-        if (d.id == id) dato = d;
-      });
-      return dato;
-    }
-  
-    actualizarData(data) {
-      this.datos.forEach((d) => {
-        if (d.id == data.id) {
-          d.customer_code_pa = data.customer_code_pa;
-          d.payment_date = data.payment_date;
-          d.payment_method = data.payment_method;
-          d.total = data.total;
-        }
-      });
-    }
+    });
   }
-  customElements.define("payment-component", PaymentComponent);
-  
+
+  detectarId() {
+    const cuerpoTabal = document.querySelector("#info-tabla");
+    cuerpoTabal.addEventListener("click", async (e) => {
+      e.preventDefault();
+      const id = e.target.id;
+      if (e.target.classList.contains("editar")) {
+        const objeto = await this.buscarObjecto(id);
+        poblarFormulario(objeto, this.formulario, this.modal);
+      } else if (e.target.classList.contains("eliminar")) {
+        if (pedirConfirmacion("este pago")) {
+          await deleteData(id, this.endPoint);
+          alertaTemporal(this.alerta, "Eliminado correctacmente", "info");
+          this.tabla();
+        }
+      } else {
+        console.log("Este elemento no tiene la clase");
+      }
+    });
+  }
+
+  async buscarObjecto(id) {
+    const dato = await getOneData(id, this.endPoint);
+    return dato;
+  }
+}
+customElements.define("payment-component", PaymentComponent);
