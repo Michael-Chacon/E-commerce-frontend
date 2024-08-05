@@ -111,8 +111,8 @@ export class StatusComponent extends HTMLElement {
       const data = Object.fromEntries(inputs);
 
       if (data.id !== "") {
-        const respuesta = await updateData(data, this.endPoint, data.id);
-        console.log(respuesta.status);
+          const respuesta = await updateData(data, this.endPoint, data.id);
+          console.log(respuesta.status);
       } else if (data.id === "") {
         data.id = parseInt(this.datos.data.length + 1);
         const respuesta = await postData(data, this.endPoint);
@@ -128,7 +128,7 @@ export class StatusComponent extends HTMLElement {
     });
   }
 
-  async tabla() {
+  async tabla() { 
     const contenedor = document.querySelector(".contenedor");
     this.datos = await getData(this.endPoint, "");
     if (this.datos.data.length === 0) {
@@ -160,7 +160,7 @@ export class StatusComponent extends HTMLElement {
         const objeto = await this.buscarObjecto(id);
         poblarFormulario(objeto, this.formulario, this.modal);
       } else if (e.target.classList.contains("eliminar")) {
-        if (pedirConfirmacion("esta estado")) {
+        if (pedirConfirmacion("este estado")) {
           await deleteData(id, this.endPoint);
           alertaTemporal(this.alerta, "Eliminado correctacmente", "info");
           this.tabla();

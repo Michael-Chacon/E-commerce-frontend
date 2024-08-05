@@ -5,25 +5,28 @@ import {
   alertaGenerica,
   alertaTemporal,
   createSelect,
+  pedirConfirmacion,
 } from "../../js/utils/form.js";
 
+import {
+  deleteData,
+  getData,
+  getOneData,
+  postData,
+  updateData,
+} from "../../repository/api.js";
+
 export class OrderComponent extends HTMLElement {
+  endPoint = "pedido";
+
   constructor() {
     super();
     this.render();
     this.formulario = document.querySelector("#formGama");
     this.modal = document.querySelector("#modal");
     this.datos = [];
-    this.status = [
-      { id: 1, name: "entregado" },
-      { id: 2, name: "enviado" },
-      { id: 3, name: "en bodega" },
-    ];
-    this.cliente = [
-      { id: 1, name: "Briand" },
-      { id: 2, name: "Henry" },
-      { id: 3, name: "Diego" },
-    ];
+    this.status = [];
+    this.cliente = [];
     this.llenarFormulario();
     this.registrar();
     this.detectarId();
@@ -82,7 +85,9 @@ export class OrderComponent extends HTMLElement {
   // --------------------------- metodos ----------------------------------------------------
   // export function createImput(elementoPadre, iddinamico, tipo, nombre, subtexto, etiqueta, hidden)
 
-  llenarFormulario() {
+  async llenarFormulario() {
+    this.status = await getData("estado");
+    this.cliente = await getData("cliente");
     createImput(this.formulario, "", "text", "id", "", "input", true);
 
     createSelect(
@@ -90,7 +95,7 @@ export class OrderComponent extends HTMLElement {
       "",
       "customer_code_or",
       "customer",
-      this.cliente
+      this.cliente.data
     );
 
     createImput(
@@ -120,7 +125,7 @@ export class OrderComponent extends HTMLElement {
       "input"
     );
 
-    createSelect(this.formulario, "", "status_code_or", "status", this.status);
+    createSelect(this.formulario, "", "status_code_or", "status", this.status.data);
 
     createImput(
       this.formulario,
@@ -142,17 +147,19 @@ export class OrderComponent extends HTMLElement {
   }
 
   registrar() {
-    this.formulario.addEventListener("submit", (e) => {
+    this.formulario.addEventListener("submit", async (e) => {
       e.preventDefault();
 
       const inputs = new FormData(this.formulario);
       const data = Object.fromEntries(inputs);
 
       if (data.id !== "") {
-        this.actualizarData(data);
+        const respuesta = await updateData(data, this.endPoint, data.id);
+        console.log(respuesta.status);
       } else if (data.id === "") {
-        data.id = this.datos.length + 1;
-        this.datos.push(data);
+        data.id = parseInt(this.datos.data.length + 1);
+        const respuesta = await postData(data, this.endPoint);
+        console.log(respuesta.status);
       } else {
         console.log("Error metodo registrar");
       }
@@ -164,16 +171,18 @@ export class OrderComponent extends HTMLElement {
     });
   }
 
-  tabla() {
+  async tabla() {
     const contenedor = document.querySelector(".contenedor");
-    if (this.datos.length === 0) {
+    this.datos = await getData(this.endPoint, "");
+
+    if (this.datos.data.length === 0) {
       alertaGenerica("No registered", contenedor);
     } else {
       contenedor.innerHTML = "";
     }
     const cuerpoTabal = document.querySelector("#info-tabla");
     cuerpoTabal.innerHTML = "";
-    this.datos.forEach((dato) => {
+    this.datos.data.forEach((dato) => {
       const {
         customer_code_or,
         status_code_or,
@@ -191,8 +200,8 @@ export class OrderComponent extends HTMLElement {
                 <td>${order_date}</td>
                 <td>${expected_date}</td>
                 <td>${delivery_date}</td>
-                <td class="text-center"><a href="#" "><i class='bx bx-pencil icon-actions idHere' id="${id}"></i></a></td>
-                <td class="text-center"><i class='bx bx-trash-alt icon-actions'></i></td>
+                <td class="text-center"><a href="#" "><i class='bx bx-pencil icon-actions editar' id="${id}"></i></a></td>
+                <td class="text-center"><i class='bx bx-trash-alt icon-actions eliminar' id="${id}"></i></td>
                 <td class="text-center"><i class='bx bx-detail icon-actions redireccionar' id="${id}"></i></td>
               </tr>
             `;
@@ -201,16 +210,21 @@ export class OrderComponent extends HTMLElement {
 
   detectarId() {
     const cuerpoTabal = document.querySelector("#info-tabla");
-    cuerpoTabal.addEventListener("click", (e) => {
+    cuerpoTabal.addEventListener("click", async (e) => {
       e.preventDefault();
-      if (e.target.classList.contains("idHere")) {
-        let id = e.target.id;
-        const objeto = this.buscarObjecto(id);
+      const id = e.target.id;
+      if (e.target.classList.contains("editar")) {
+        const objeto = await this.buscarObjecto(id);
         poblarFormulario(objeto, this.formulario, this.modal);
+      } else if (e.target.classList.contains("eliminar")) {
+        if (pedirConfirmacion("esta orden")) {
+          await deleteData(id, this.endPoint);
+          alertaTemporal(this.alerta, "Eliminado correctacmente", "info");
+          this.tabla();
+        }
       } else if (e.target.classList.contains("redireccionar")) {
-        let id = e.target.id;
         console.log("aja", id);
-        const contenido = document.querySelector(".container")
+        const contenido = document.querySelector(".container");
         contenido.parentElement.parentElement.innerHTML = `<order-detail-component idOrder="${id}"></order-detail-component>`;
       } else {
         console.log("Este elemento no tiene la clase");
@@ -218,25 +232,9 @@ export class OrderComponent extends HTMLElement {
     });
   }
 
-  buscarObjecto(id) {
-    let dato = "";
-    this.datos.forEach((d) => {
-      if (d.id == id) dato = d;
-    });
+  async buscarObjecto(id) {
+    const dato = await getOneData(id, this.endPoint);
     return dato;
-  }
-
-  actualizarData(data) {
-    this.datos.forEach((d) => {
-      if (d.id == data.id) {
-        d.customer_code_or = data.customer_code_or;
-        d.status_code_or = data.status_code_or;
-        d.order_date = data.order_date;
-        d.expected_date = data.expected_date;
-        d.delivery_date = data.delivery_date;
-        d.comment = data.comment;
-      }
-    });
   }
 }
 customElements.define("order-component", OrderComponent);
