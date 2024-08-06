@@ -17,7 +17,7 @@ import {
 } from "../../repository/api.js";
 
 export class CustomerComponent extends HTMLElement {
-  endPoint = "cliente";
+  endPoint = "api/customers";
 
   constructor() {
     super();
@@ -40,9 +40,20 @@ export class CustomerComponent extends HTMLElement {
           <div class="row padre">
               <div class="col-12 hija2 shadow p-3 mb-5 bg-body rounded">
               <div class="alerta"></div>
-              <button type="button" class="btn btn-outline-dark"  data-bs-toggle="modal" data-bs-target="#modal">
+                <button type="button" class="btn btn-outline-dark"  data-bs-toggle="modal" data-bs-target="#modal">
                   Add customer
-                  </button>
+                </button>
+                <button type="button" class="btn btn-outline-secondary btn-sm" data-bs-toggle="modal" data-bs-target="#filtroCiudad">
+                  Filtrar por ciudad
+                </button>
+                <button type="button" class="btn btn-outline-success btn-sm" data-bs-toggle="modal" data-bs-target="#filtroPedidoPend">
+                  Filtrar por pedidos pendientes
+                </button>
+
+                <button type="button" class="btn btn-outline-danger btn-sm">
+                    Mostrar todo
+                </button>
+                
                   <hr>
                   <table class="table table-bordered">
                   <thead>
@@ -95,9 +106,27 @@ export class CustomerComponent extends HTMLElement {
                         
                       </form>
                   </div>
+
+
               </div>
               </div>
           </div>
+          <div class="modal fade " id="filtroCiudad" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+          <div class="modal-dialog ">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Consultar clientes por ciudad</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+              </div>
+              <div class="modal-body">
+                <form id="clienteCiudad">
+                </form>
+              </div>
+              </div>
+            </div>
+          </div>
+
+         
           `;
   }
 
@@ -105,8 +134,8 @@ export class CustomerComponent extends HTMLElement {
   // export function createImput(elementoPadre, iddinamico, tipo, nombre, subtexto, etiqueta, hidden)
 
   async llenarFormulario() {
-    this.empleados = await getData("empleado")
-    this.ciudades = await getData("ciudad")
+    this.empleados = await getData("api/employees")
+    this.ciudades = await getData("api/cities")
     createImput(this.formulario, "", "text", "id", "", "input", true);
 
     createImput(
@@ -179,6 +208,14 @@ export class CustomerComponent extends HTMLElement {
       this.empleados.data
     );
 
+    createSelect(
+      document.querySelector("#clienteCiudad"),
+      "",
+      "city",
+      "",
+      this.ciudades.data
+    )
+
     createImput(
       document.querySelector("#tel"),
       "",
@@ -187,11 +224,21 @@ export class CustomerComponent extends HTMLElement {
       "Telefon",
       "input"
     );
+
+    const botonCiudad = document.createElement("div");
+    botonCiudad.innerHTML = `
+          <div class="modal-footer">
+            <button type="button" class="btn btn-outline-danger" data-bs-dismiss="modal">Cancelar</button>
+            <button type="submit" class="btn btn-outline-dark" id="btnEnviar">Enviar</button>
+          </div>
+        `;
+    document.querySelector("#clienteCiudad").appendChild(botonCiudad);
+
     const botones = document.createElement("div");
     botones.innerHTML = `
           <div class="modal-footer">
             <button type="button" class="btn btn-outline-danger" data-bs-dismiss="modal">Cancelar</button>
-            <button type="submit" class="btn btn-outline-dark" id="btnRegistrar">Registrar</button>
+            <button type="submit" class="btn btn-outline-dark" id="btnRegistrar">Enviar</button>
           </div>
         `;
     this.formulario.appendChild(botones);
