@@ -136,24 +136,24 @@ export class OfficeComponent extends HTMLElement {
 
       const inputs = new FormData(this.formulario);
       const data = Object.fromEntries(inputs);
-      console.log(data)
+      
       const obj = {
         id: data.id,
         address: {
           id: data.iddir,
           addressLine1: data.addressLine1,
           addressLine2: data.addressLine2,
-          city: { id: parseInt(data.city), },
+          city: { id: parseInt(data.city) },
         },
-        phones: [{ number: parseInt(data.number), }],
+        phones: [{ number: parseInt(data.number) }],
       };
-       console.log(obj)
+      
       if (obj.id !== "") {
         const respuesta = await updateData(obj, this.endPoint, obj.id);
         console.log(respuesta.status);
       } else if (obj.id === "") {
         const respuesta = await postData(obj, this.endPoint);
-        this.guardarTelefono(respuesta, data.number)
+        this.guardarTelefono(respuesta, data.number);
         console.log(respuesta.status);
       } else {
         console.log("Error metodo registrar");
@@ -166,19 +166,19 @@ export class OfficeComponent extends HTMLElement {
     });
   }
 
-  async guardarTelefono(oficina, numero){
+  async guardarTelefono(oficina, numero) {
     const obj = {
-      officeCodePh: {"id": oficina.data.id},
+      officeCodePh: { id: oficina.data.id },
       number: parseInt(numero),
-    }
-      const telefon = await postData(obj, "api/phones")
-      console.log(telefon.data.status)
+    };
+    const telefon = await postData(obj, "api/phones");
+    
   }
 
   async tabla() {
     const contenedor = document.querySelector(".contenedor");
     this.datos = await getData(this.endPoint, "");
-    console.log(this.datos.data);
+    // console.log(this.datos.data);
     if (this.datos.data.length === 0) {
       alertaGenerica("No registered", contenedor);
     } else {
@@ -188,7 +188,8 @@ export class OfficeComponent extends HTMLElement {
     cuerpoTabal.innerHTML = "";
     for (const dato of this.datos.data) {
       const { address, id } = dato;
-      const numero = await this.obtenerNumero(id);
+      const n = await this.obtenerNumero(id);
+      const numero = n.number;
       cuerpoTabal.innerHTML += /*html*/ `
         <tr>
           <th scope="row">${id}</th>
@@ -209,38 +210,38 @@ export class OfficeComponent extends HTMLElement {
       e.preventDefault();
       const idOffice = e.target.id;
       if (e.target.classList.contains("editar")) {
-
         const objeto = await this.buscarObjecto(idOffice);
-        
+
         console.log(objeto);
         objeto.x = objeto.address.city.id;
         objeto.iddir = objeto.address.id;
         const {
           id,
-          address: {
-            addressLine1,
-            addressLine2,
-          },
+          address: { addressLine1, addressLine2 },
           x,
-          iddir
+          iddir,
         } = objeto;
-        
+
         const datosend = {
           id,
           addressLine1,
           addressLine2,
           iddir,
         };
-        console.log(id)
         datosend.city = x;
-        datosend.number = await this.obtenerNumero(id);
-        
+        const numero = await this.obtenerNumero(id);
+        datosend.number = numero.number;
+
         poblarFormulario(datosend, this.formulario, this.modal);
       } else if (e.target.classList.contains("eliminar")) {
         if (pedirConfirmacion("esta oficina")) {
-          await deleteData(idOffice, this.endPoint);
-          alertaTemporal(this.alerta, "Eliminado correctacmente", "info");
-          this.tabla();
+          const getPhone = await this.obtenerNumero(e.target.id);
+          await deleteData(getPhone.id, "api/phones");
+          // setTimeout(async () => {
+            await deleteData(idOffice, this.endPoint);
+            alertaTemporal(this.alerta, "Eliminado correctacmente", "info");
+            this.tabla();
+          // }, 2000);
         }
       } else {
         console.log("Este elemento no tiene la clase");
@@ -248,10 +249,9 @@ export class OfficeComponent extends HTMLElement {
     });
   }
 
-  async obtenerNumero(idOficina){
-    const telefono = await getOneData(idOficina, "api/phones")
-    console.log(telefono.number)
-    return telefono.number
+  async obtenerNumero(idOficina) {
+    const telefono = await getOneData(idOficina, "api/phones");
+    return telefono;
   }
 
   async buscarObjecto(id) {
