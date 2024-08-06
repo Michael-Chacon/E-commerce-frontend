@@ -61,7 +61,6 @@ export class CustomerComponent extends HTMLElement {
                       <th scope="col">Id</th>
                       <th scope="col">Name</th>
                       <th scope="col">Last name </th>
-                      <th scope="col">Phone</th>
                       <th scope="col">Email</th>
                       <th scope="col">City</th>
                       <th colspan="2"></th>
@@ -134,15 +133,15 @@ export class CustomerComponent extends HTMLElement {
   // export function createImput(elementoPadre, iddinamico, tipo, nombre, subtexto, etiqueta, hidden)
 
   async llenarFormulario() {
-    this.empleados = await getData("api/employees")
-    this.ciudades = await getData("api/cities")
+    this.empleados = await getData("api/employees");
+    this.ciudades = await getData("api/cities");
     createImput(this.formulario, "", "text", "id", "", "input", true);
 
     createImput(
       document.querySelector("#n1"),
       "",
       "text",
-      "first_name",
+      "firstName",
       "Name",
       "input"
     );
@@ -151,7 +150,7 @@ export class CustomerComponent extends HTMLElement {
       document.querySelector("#l1"),
       "",
       "text",
-      "last_name1",
+      "lastName1",
       "First last name",
       "input"
     );
@@ -160,7 +159,7 @@ export class CustomerComponent extends HTMLElement {
       document.querySelector("#l2"),
       "",
       "text",
-      "last_name2",
+      "lastName2",
       "Second last name",
       "input"
     );
@@ -178,7 +177,7 @@ export class CustomerComponent extends HTMLElement {
       document.querySelector("#d1"),
       "",
       "text",
-      "address_line1",
+      "addressLine1",
       "Address 1",
       "input"
     );
@@ -187,7 +186,7 @@ export class CustomerComponent extends HTMLElement {
       document.querySelector("#d2"),
       "",
       "text",
-      "address_line2",
+      "addressLine2",
       "Address 2",
       "input"
     );
@@ -195,17 +194,9 @@ export class CustomerComponent extends HTMLElement {
     createSelect(
       document.querySelector("#cc"),
       "",
-      "city_code_d",
-      "somebody to love",
-      this.ciudades.data  
-    );
-
-    createSelect(
-      document.querySelector("#ec"),
-      "",
-      "sales_rep_employee_code",
-      "somebody to love",
-      this.empleados.data
+      "city",
+      "nada",
+      this.ciudades.data
     );
 
     createSelect(
@@ -214,7 +205,7 @@ export class CustomerComponent extends HTMLElement {
       "city",
       "",
       this.ciudades.data
-    )
+    );
 
     createImput(
       document.querySelector("#tel"),
@@ -224,6 +215,22 @@ export class CustomerComponent extends HTMLElement {
       "Telefon",
       "input"
     );
+
+    const selectEmployee = document.createElement("div");
+    selectEmployee.innerHTML = `
+    <label for="exampleInputEmail1" class="form-label mt-3">Employees</label>
+    <select class="form-select " name="salesRep" id="salesRep" required aria-label="Employees">
+        <option>Seleccione el empleado</option>
+    </select>
+    `;
+    document.querySelector("#ec").appendChild(selectEmployee);
+    const padre = document.querySelector("#salesRep");
+    this.empleados.data.forEach((item) => {
+      const option = document.createElement("option");
+      option.value = item.id;
+      option.textContent = `${item.firstName} ${item.lastName1}`;
+      padre.appendChild(option);
+    });
 
     const botonCiudad = document.createElement("div");
     botonCiudad.innerHTML = `
@@ -250,14 +257,28 @@ export class CustomerComponent extends HTMLElement {
 
       const inputs = new FormData(this.formulario);
       const data = Object.fromEntries(inputs);
-
+      console.log(data);
+      const information = {
+        id: data.id,
+        firstName: data.firstName,
+        lastName1: data.lastName1,
+        lastName2: data.lastName2,
+        email: data.email,
+        city: { id: parseInt(data.city) },
+        address: {
+          addressLine1: data.addressLine1,
+          addressLine2: data.addressLine2,
+          city: { id: parseInt(data.city) },
+        },
+        salesRep: { id: parseInt(data.salesRep) },
+      };
+      console.log(information)
       if (data.id !== "") {
-        const respuesta = await updateData(data, this.endPoint, data.id);
-        console.log(respuesta.status);
+        const respuesta = await updateData(information, this.endPoint, data.id);
+        console.log(respuesta);
       } else if (data.id === "") {
-        data.id = parseInt(this.datos.data.length + 1);
-        const respuesta = await postData(data, this.endPoint);
-        console.log(respuesta.status);
+        const respuesta = await postData(information, this.endPoint);
+        console.log(respuesta);
       } else {
         console.log("Error metodo registrar");
       }
@@ -281,23 +302,14 @@ export class CustomerComponent extends HTMLElement {
     const cuerpoTabal = document.querySelector("#info-tabla");
     cuerpoTabal.innerHTML = "";
     this.datos.data.forEach((dato) => {
-      const {
-        email,
-        first_name,
-        id,
-        last_name1,
-        last_name2,
-        city_code_d,
-        number,
-      } = dato;
+      const { email, firstName, id, lastName1, lastName2, city, number } = dato;
       cuerpoTabal.innerHTML += /*html*/ `
                 <tr>
                 <th scope="row">${id}</th>
-                <td>${first_name}</td>
-                <td>${last_name1} ${last_name2}</td>
-                <td>${number}</td>
+                <td>${firstName}</td>
+                <td>${lastName1} ${lastName2}</td>
                 <td>${email}</td>
-                <td>${city_code_d}</td>
+                <td>${city.name}</td>
                 <td class="text-center"><a href="#" "><i class='bx bx-pencil icon-actions editar' id="${id}"></i></a></td>
                 <td class="text-center"><i class='bx bx-trash-alt icon-actions eliminar' id="${id}"></i></td>
               </tr>
@@ -325,9 +337,39 @@ export class CustomerComponent extends HTMLElement {
     });
   }
 
-  async buscarObjecto(id) {
-    const dato = await getOneData(id, this.endPoint);
-    return dato;
+  async buscarObjecto(ida) {
+    const dato = await getOneData(ida, this.endPoint);
+    console.log(dato);    
+    const {
+      id: id,
+      address: {  
+        addressLine1,
+        addressLine2,
+        city: { id: city, name: name }
+      },
+      id: officeId,
+      email,
+      firstName,
+      lastName1,
+      lastName2, 
+    } = dato  ;
+
+    const newObj = {
+      officeId,
+      addressLine1,
+      addressLine2,
+      id,
+      name,
+      email,
+      firstName,
+      lastName1,
+      lastName2,
+    };
+    newObj.number = 1234
+    newObj.city = dato.city.id
+    newObj.salesRep = dato.salesRep.id
+    console.log(newObj);
+    return newObj;
   }
 }
 customElements.define("customer-component", CustomerComponent);
