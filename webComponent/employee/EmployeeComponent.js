@@ -49,6 +49,11 @@ export class EmployeeComponent extends HTMLElement {
                 <button type="button" class="btn btn-outline-success btn-sm" data-bs-toggle="modal" data-bs-target="#filtroPedidoAsignado">
                   Filtrar por pedidos asignados
                 </button>
+
+                <button type="button" class="btn btn-outline-danger btn-sm">
+                    Mostrar todo
+                </button>
+
                   <hr>
                   <table class="table table-bordered">
                   <thead>
