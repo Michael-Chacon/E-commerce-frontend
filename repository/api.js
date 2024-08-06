@@ -84,7 +84,7 @@ export async function getData(endpoint, embed = "") {
  */
 
 export async function postData(data, endpoint) {
-  console.log(data)
+  // console.log(data)
   try {
     const response = await fetch(`${URL_BASE}/${endpoint}`, {
       method: "POST",

@@ -17,7 +17,7 @@ import {
 } from "../../repository/api.js";
 
 export class OfficeComponent extends HTMLElement {
-  endPoint = "office";
+  endPoint = "api/offices";
 
   constructor() {
     super();
@@ -25,13 +25,7 @@ export class OfficeComponent extends HTMLElement {
     this.formulario = document.querySelector("#formGama");
     this.modal = document.querySelector("#modal");
     this.datos = [];
-    this.ciudades = [
-      { id: 1, name: "San Gil" },
-      { id: 2, name: "Bogotá" },
-      { id: 3, name: "Medellín" },
-      { id: 4, name: "Cartagena" },
-      { id: 5, name: "Cali" },
-    ];
+    this.ciudades = [];
     this.llenarFormulario();
     this.registrar();
     this.detectarId();
@@ -93,14 +87,16 @@ export class OfficeComponent extends HTMLElement {
   // --------------------------- metodos ----------------------------------------------------
   // export function createImput(elementoPadre, iddinamico, tipo, nombre, subtexto, etiqueta, hidden)
 
-  llenarFormulario() {
+  async llenarFormulario() {
+    this.ciudades = await getData("api/cities");
     createImput(this.formulario, "", "text", "id", "", "input", true);
+    createImput(this.formulario, "", "text", "iddir", "", "input", true);
 
     createImput(
       this.formulario,
       "",
       "text",
-      "address_line1",
+      "addressLine1",
       "Address 1",
       "input"
     );
@@ -109,7 +105,7 @@ export class OfficeComponent extends HTMLElement {
       this.formulario,
       "",
       "text",
-      "address_line2",
+      "addressLine2",
       "Address 2",
       "input"
     );
@@ -119,9 +115,9 @@ export class OfficeComponent extends HTMLElement {
     createSelect(
       this.formulario,
       "",
-      "city_code_d",
+      "city",
       "somebody to love",
-      this.ciudades
+      this.ciudades.data
     );
 
     const botones = document.createElement("div");
@@ -140,13 +136,30 @@ export class OfficeComponent extends HTMLElement {
 
       const inputs = new FormData(this.formulario);
       const data = Object.fromEntries(inputs);
-
-      if (data.id !== "") {
-        const respuesta = await updateData(data, this.endPoint, data.id);
+      console.log(data)
+      // data.address = {
+      //   addressLine1: data.addressLine1,
+      //   addressLine2: data.addressLine2,
+      //   city: { id: data.city },
+      // };
+      // data.officeCodePh = { number: data.number };
+      // console.log(data);
+      const obj = {
+        id: data.id,
+        address: {
+          id: data.iddir,
+          addressLine1: data.addressLine1,
+          addressLine2: data.addressLine2,
+          city: { id: parseInt(data.city), },
+        },
+        officeCodePh: { number: parseInt(data.number), },
+      };
+       console.log(obj)
+      if (obj.id !== "") {
+        const respuesta = await updateData(obj, this.endPoint, obj.id);
         console.log(respuesta.status);
-      } else if (data.id === "") {
-        data.id = parseInt(this.datos.data.length + 1);
-        const respuesta = await postData(data, this.endPoint);
+      } else if (obj.id === "") {
+        const respuesta = await postData(obj, this.endPoint);
         console.log(respuesta.status);
       } else {
         console.log("Error metodo registrar");
@@ -162,6 +175,7 @@ export class OfficeComponent extends HTMLElement {
   async tabla() {
     const contenedor = document.querySelector(".contenedor");
     this.datos = await getData(this.endPoint, "");
+    console.log(this.datos.data);
     if (this.datos.data.length === 0) {
       alertaGenerica("No registered", contenedor);
     } else {
@@ -170,13 +184,13 @@ export class OfficeComponent extends HTMLElement {
     const cuerpoTabal = document.querySelector("#info-tabla");
     cuerpoTabal.innerHTML = "";
     this.datos.data.forEach((dato) => {
-      const { address_line1, address_line2, city_code_d, id, number } = dato;
+      const { address, id, number } = dato;
       cuerpoTabal.innerHTML += /*html*/ `
               <tr>
               <th scope="row">${id}</th>
-              <td>${city_code_d}</td>
-              <td>${address_line1}</td>
-              <td>${address_line2}</td>
+              <td>${address.city.name}</td>
+              <td>${address.addressLine1}</td>
+              <td>${address.addressLine2}</td>
               <td>${number}</td>
               <td class="text-center"><a href="#" "><i class='bx bx-pencil icon-actions editar' id="${id}"></i></a></td>
               <td class="text-center"><i class='bx bx-trash-alt icon-actions eliminar' id="${id}"></i></td>
@@ -189,13 +203,37 @@ export class OfficeComponent extends HTMLElement {
     const cuerpoTabal = document.querySelector("#info-tabla");
     cuerpoTabal.addEventListener("click", async (e) => {
       e.preventDefault();
-      const id = e.target.id;
+      const idOffice = e.target.id;
       if (e.target.classList.contains("editar")) {
-        const objeto = await this.buscarObjecto(id);
-        poblarFormulario(objeto, this.formulario, this.modal);
+
+        const objeto = await this.buscarObjecto(idOffice);
+
+        console.log(objeto);
+        objeto.x = objeto.address.city.id;
+        objeto.iddir = objeto.address.id;
+        const {
+          id,
+          address: {
+            addressLine1,
+            addressLine2,
+          },
+          x,
+          iddir
+        } = objeto;
+        
+        const datosend = {
+          id,
+          addressLine1,
+          addressLine2,
+          iddir,
+        };
+        datosend.city = x;
+        // console.log(datosend);
+        
+        poblarFormulario(datosend, this.formulario, this.modal);
       } else if (e.target.classList.contains("eliminar")) {
         if (pedirConfirmacion("esta oficina")) {
-          await deleteData(id, this.endPoint);
+          await deleteData(idOffice, this.endPoint);
           alertaTemporal(this.alerta, "Eliminado correctacmente", "info");
           this.tabla();
         }

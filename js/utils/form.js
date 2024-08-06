@@ -56,11 +56,11 @@ export function createSelect(elementoPadre, iddinamico, nombre, subtexto, data){
   select.setAttribute("required", true);
   select.setAttribute("aria-label", "Default select example");
 
-  console.log(data)
+  // console.log(data)
   data.forEach(item => {
     const option = document.createElement('option');
     option.value = item.id;
-    option.textContent = item.id;
+    option.textContent = item.name;
     select.appendChild(option);
   });
 
