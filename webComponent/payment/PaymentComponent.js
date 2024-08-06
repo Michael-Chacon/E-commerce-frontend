@@ -35,16 +35,25 @@ export class PaymentComponent extends HTMLElement {
   }
 
   render() {
-    this.innerHTML = `
+    this.innerHTML = /*html*/`
           <div class="container " style="margin-top: 20px;">
           <div class="row padre">
               <div class="col">
               </div>
               <div class="col-10 hija2 shadow p-3 mb-5 bg-body rounded">
               <div class="alerta"></div>
-              <button type="button" class="btn btn-outline-dark"  data-bs-toggle="modal" data-bs-target="#modal">
+                <button type="button" class="btn btn-outline-dark"  data-bs-toggle="modal" data-bs-target="#modal">
                   Add payment
-                  </button>
+                </button>
+
+                <button type="button" class="btn btn-outline-secondary btn-sm" data-bs-toggle="modal" data-bs-target="#filtroCliente">
+                    Filtrar por cliente
+                </button>
+
+                <button type="button" class="btn btn-outline-success btn-sm" data-bs-toggle="modal" data-bs-target="#filtroMetodoPago">
+                    Filtrar por método de pago
+                </button>
+
                   <hr>
                   <table class="table table-bordered">
                   <thead>
@@ -81,6 +90,36 @@ export class PaymentComponent extends HTMLElement {
               </div>
               </div>
           </div>
+
+          <div class="modal fade " id="filtroCliente" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+          <div class="modal-dialog ">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Consultar pagos por cliente</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+              </div>
+              <div class="modal-body">
+                <form id="gamaProducto">
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="modal fade" id="filtroMetodoPago" data-bs-backdrop="static" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+          <div class="modal-dialog">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Consultar pagos realizados</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+              </div>
+              <div class="modal-body">
+                <form id="stockProducto">
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
           `;
   }
 

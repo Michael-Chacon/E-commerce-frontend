@@ -33,14 +33,22 @@ export class EmployeeComponent extends HTMLElement {
   }
 
   render() {
-    this.innerHTML = `
+    this.innerHTML = /*html*/`
           <div class="container " style="margin-top: 20px;">
           <div class="row padre">
               <div class="col-12 hija2 shadow p-3 mb-5 bg-body rounded">
               <div class="alerta"></div>
-              <button type="button" class="btn btn-outline-dark"  data-bs-toggle="modal" data-bs-target="#modal">
+                <button type="button" class="btn btn-outline-dark"  data-bs-toggle="modal" data-bs-target="#modal">
                   Add employee
-                  </button>
+                </button>
+
+                <button type="button" class="btn btn-outline-secondary btn-sm" data-bs-toggle="modal" data-bs-target="#filtroOficina">
+                  Filtrar por Oficina
+                </button>
+
+                <button type="button" class="btn btn-outline-success btn-sm" data-bs-toggle="modal" data-bs-target="#filtroPedidoAsignado">
+                  Filtrar por pedidos asignados
+                </button>
                   <hr>
                   <table class="table table-bordered">
                   <thead>
@@ -64,19 +72,49 @@ export class EmployeeComponent extends HTMLElement {
           <!-- Button trigger modal -->  
           <!-- Modal -->
           <div class="modal fade" id="modal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
-              <div class="modal-dialog">
+            <div class="modal-dialog">
               <div class="modal-content">
                   <div class="modal-header">
-                  <h5 class="modal-title" id="staticBackdropLabel">New employee </h5>
-                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <h5 class="modal-title" id="staticBackdropLabel">New employee </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                   </div>
                   <div class="modal-body">
                       <form  id="formGama">
                       </form>
                   </div>
               </div>
-              </div>
+            </div>
           </div>
+
+          <div class="modal fade " id="filtroOficina" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+          <div class="modal-dialog ">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Consultar empleados por oficina</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+              </div>
+              <div class="modal-body">
+                <form id="gamaProducto">
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="modal fade" id="filtroPedidoAsignado" data-bs-backdrop="static" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+          <div class="modal-dialog">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Consultar empleados por pedidos asignados</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+              </div>
+              <div class="modal-body">
+                <form id="stockProducto">
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
           `;
   }
 

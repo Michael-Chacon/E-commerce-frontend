@@ -35,7 +35,7 @@ export class ProductComponent extends HTMLElement {
   }
 
   render() {
-    this.innerHTML = `
+    this.innerHTML = /*html*/`
           <div class="container " style="margin-top: 20px;">
           <div class="row padre">
               <div class="col-12 hija2 shadow p-3 mb-5 bg-body rounded">
@@ -79,12 +79,12 @@ export class ProductComponent extends HTMLElement {
               <div class="modal-dialog">
               <div class="modal-content">
                   <div class="modal-header">
-                  <h5 class="modal-title" id="staticBackdropLabel">New product </h5>
-                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <h5 class="modal-title" id="staticBackdropLabel">New product </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                   </div>
                   <div class="modal-body">
-                      <form  id="formGama">
-                      </form>
+                    <form  id="formGama">
+                    </form>
                   </div>
               </div>
               </div>
@@ -94,7 +94,7 @@ export class ProductComponent extends HTMLElement {
           <div class="modal-dialog ">
             <div class="modal-content">
               <div class="modal-header">
-                <h5 class="modal-title" id="exampleModalLabel">Consultar roductos por ama</h5>
+                <h5 class="modal-title" id="exampleModalLabel">Consultar productos por gama</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
               </div>
               <div class="modal-body">
