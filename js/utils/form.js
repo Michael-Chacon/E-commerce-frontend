@@ -16,7 +16,7 @@ export function createImput(
     newLabel.setAttribute("for", iddinamico);
     newLabel.textContent = capitalizeFirstLetter(nombre);
   }
-
+                      
   const element = document.createElement(etiqueta);
   element.classList.add("form-control", "mb-3");
   element.setAttribute("type", tipo);
