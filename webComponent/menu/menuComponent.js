@@ -24,8 +24,6 @@ export class MenuComponent extends HTMLElement {
         <ul class="side-dropdown">
           <li><a href="#" class="listaProductos">Listado</a></li>
           <li><a href="#" class="gama">Gama producto</a></li>
-          <li><a href="#" class="eliminar">Bajo Stock</a></li>
-          <li><a href="#" class="editar">Filtrar por gama</a></li>
         </ul>
       </li>
       <li>
@@ -46,8 +44,6 @@ export class MenuComponent extends HTMLElement {
       ></a>
       <ul class="side-dropdown">
         <li><a href="#" class="listaPedidos">Listado</a></li>
-        <li><a href="#" class="persona editar">Por estado</a></li>
-        <li><a href="#" class="persona eliminar">Por Rango de Fechas</a></li>
       </ul>
     </li>
       <li>
@@ -58,8 +54,6 @@ export class MenuComponent extends HTMLElement {
       <ul class="side-dropdown">
         <li><a href="#" class="listaPagos">Listado</a></li>
         <li><a href="#" class="metodoPago">Metodos de pago</a></li>
-        <li><a href="#" class="estado editar">Filtro por cliente</a></li>
-        <li><a href="#" class="estado eliminar">Filtro por método</a></li>
       </ul>
     </li>
     <li>
@@ -69,8 +63,6 @@ export class MenuComponent extends HTMLElement {
       ></a>
       <ul class="side-dropdown">
         <li><a href="#" class="listaEmpleados">Listado</a></li>
-        <li><a href="#" class="marca editar">Por oficina</a></li>
-        <li><a href="#" class="marca eliminar">Pedidos asignados</a></li>
       </ul>
     </li>
     <li>
