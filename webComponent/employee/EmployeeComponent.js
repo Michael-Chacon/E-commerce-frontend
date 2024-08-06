@@ -46,10 +46,6 @@ export class EmployeeComponent extends HTMLElement {
                   Filtrar por Oficina
                 </button>
 
-                <button type="button" class="btn btn-outline-success btn-sm" data-bs-toggle="modal" data-bs-target="#filtroPedidoAsignado">
-                  Filtrar por pedidos asignados
-                </button>
-
                 <button type="button" class="btn btn-outline-danger btn-sm">
                     Mostrar todo
                 </button>
@@ -173,6 +169,15 @@ export class EmployeeComponent extends HTMLElement {
             </div>
           `;
     this.formulario.appendChild(botones);
+
+    const botonesempleadoOficina = document.createElement("div");
+    botonesempleadoOficina.innerHTML = `
+            <div class="modal-footer">
+              <button type="button" class="btn btn-outline-danger" data-bs-dismiss="modal">Cancelar</button>
+              <button type="submit" class="btn btn-outline-dark" id="btnRegistrar">Enviar</button>
+            </div>
+          `;
+    document.querySelector("#empleadoOficina").appendChild(botonesempleadoOficina);
   }
 
   registrar() {

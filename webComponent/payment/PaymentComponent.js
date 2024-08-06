@@ -17,7 +17,7 @@ import {
 } from "../../repository/api.js";
 
 export class PaymentComponent extends HTMLElement {
-  endPoint = "pago";
+  endPoint = "api/payments";
 
   constructor() {
     super();
@@ -99,7 +99,7 @@ export class PaymentComponent extends HTMLElement {
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
               </div>
               <div class="modal-body">
-                <form id="gamaProducto">
+                <form id="pagoCliente">
                 </form>
               </div>
             </div>
@@ -114,7 +114,7 @@ export class PaymentComponent extends HTMLElement {
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
               </div>
               <div class="modal-body">
-                <form id="stockProducto">
+                <form id="pagoMetodo">
                 </form>
               </div>
             </div>
@@ -127,8 +127,8 @@ export class PaymentComponent extends HTMLElement {
   // export function createImput(elementoPadre, iddinamico, tipo, nombre, subtexto, etiqueta, hidden)
 
   async llenarFormulario() {
-    this.metodo = await getData("metodo_pago")
-    this.cliente = await getData("cliente")
+    this.metodo = await getData("api/payment-methods")
+    this.cliente = await getData("api/customers")
 
     createImput(this.formulario, "", "text", "id", "", "input", true);
 
@@ -160,6 +160,22 @@ export class PaymentComponent extends HTMLElement {
       "input"
     );
 
+    createSelect(
+      document.querySelector("#pagoCliente"),
+      "",
+      "Cliente",
+      "",
+      this.cliente.data
+    );
+
+    createSelect(
+      document.querySelector("#pagoMetodo"),
+      "",
+      "Métodos de pago",
+      "",
+      this.metodo.data
+    );
+
     const botones = document.createElement("div");
     botones.innerHTML = `
             <div class="modal-footer">
@@ -168,6 +184,24 @@ export class PaymentComponent extends HTMLElement {
             </div>
           `;
     this.formulario.appendChild(botones);
+
+    const botonespagoCliente = document.createElement("div");
+    botonespagoCliente.innerHTML = `
+            <div class="modal-footer">
+              <button type="button" class="btn btn-outline-danger" data-bs-dismiss="modal">Cancelar</button>
+              <button type="submit" class="btn btn-outline-dark" id="btnRegistrar">Enviar</button>
+            </div>
+          `;
+    document.querySelector("#pagoCliente").appendChild(botonespagoCliente);
+
+    const botonesMetodoPago = document.createElement("div");
+    botonesMetodoPago.innerHTML = `
+            <div class="modal-footer">
+              <button type="button" class="btn btn-outline-danger" data-bs-dismiss="modal">Cancelar</button>
+              <button type="submit" class="btn btn-outline-dark" id="btnRegistrar">Enviar</button>
+            </div>
+          `;
+    document.querySelector("#pagoMetodo").appendChild(botonesMetodoPago);
   }
 
   registrar() {

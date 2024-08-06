@@ -52,7 +52,7 @@ export class OrderComponent extends HTMLElement {
                   Filtrar por rango de fechas
                 </button>
 
-                <button type="button" class="btn btn-outline-success btn-sm" data-bs-toggle="modal" data-bs-target="#filtroRangoFecha">
+                <button type="button" class="btn btn-outline-success btn-sm" data-bs-toggle="modal" data-bs-target="#filtroPedidoAsignado">
                   Pedidos asignados a empleados
                 </button>
 
@@ -187,7 +187,7 @@ export class OrderComponent extends HTMLElement {
       "input"
     );
 
-    createSelect(this.formulario, "", "status_code_or", "status", this.status.data);
+  
 
     createSelect(
       document.querySelector("#ordenStatus"),
@@ -195,7 +195,7 @@ export class OrderComponent extends HTMLElement {
       "Status",
       "",
       this.status.data
-    )
+    );
 
     createImput(
       document.querySelector("#rangoFecha"),
@@ -224,6 +224,18 @@ export class OrderComponent extends HTMLElement {
       "textarea"
     );
 
+    createSelect(
+      document.querySelector("#pedidosEmpleado"),
+      "",
+      "Empleado",
+      "",
+      this.status.data
+    );
+
+    createSelect(this.formulario, "", "status_code_or", "status", this.status.data);
+
+
+
     const botones = document.createElement("div");
     botones.innerHTML = `
             <div class="modal-footer">
@@ -232,6 +244,33 @@ export class OrderComponent extends HTMLElement {
             </div>
           `;
     this.formulario.appendChild(botones);
+
+    const botonesEstado = document.createElement("div");
+    botonesEstado.innerHTML = `
+            <div class="modal-footer">
+              <button type="button" class="btn btn-outline-danger" data-bs-dismiss="modal">Cancelar</button>
+              <button type="submit" class="btn btn-outline-dark" id="btnRegistrar">Enviar</button>
+            </div>
+          `;
+    document.querySelector("#ordenStatus").appendChild(botonesEstado);
+
+    const botonesRangoFecha = document.createElement("div");
+    botonesRangoFecha.innerHTML = `
+            <div class="modal-footer">
+              <button type="button" class="btn btn-outline-danger" data-bs-dismiss="modal">Cancelar</button>
+              <button type="submit" class="btn btn-outline-dark" id="btnRegistrar">Enviar</button>
+            </div>
+          `;
+    document.querySelector("#rangoFecha").appendChild(botonesRangoFecha);
+
+    const botonesPedidoEmpleado = document.createElement("div");
+    botonesPedidoEmpleado.innerHTML = `
+            <div class="modal-footer">
+              <button type="button" class="btn btn-outline-danger" data-bs-dismiss="modal">Cancelar</button>
+              <button type="submit" class="btn btn-outline-dark" id="btnRegistrar">Enviar</button>
+            </div>
+          `;
+    document.querySelector("#pedidosEmpleado").appendChild(botonesPedidoEmpleado);
   }
 
   registrar() {

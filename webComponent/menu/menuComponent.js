@@ -5,7 +5,7 @@ export class MenuComponent extends HTMLElement {
   }
 
   render() {
-    this.innerHTML = `
+    this.innerHTML = /*html*/`
     <style rel="stylesheet">
         @import "/webComponent/menu/style.css";
     </style>
