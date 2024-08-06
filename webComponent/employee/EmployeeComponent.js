@@ -17,7 +17,7 @@ import {
 } from "../../repository/api.js";
 
 export class EmployeeComponent extends HTMLElement {
-  endPoint = "empleado";
+  endPoint = "api/employees";
   constructor() {
     super();
     this.render();
@@ -49,6 +49,11 @@ export class EmployeeComponent extends HTMLElement {
                 <button type="button" class="btn btn-outline-success btn-sm" data-bs-toggle="modal" data-bs-target="#filtroPedidoAsignado">
                   Filtrar por pedidos asignados
                 </button>
+
+                <button type="button" class="btn btn-outline-danger btn-sm">
+                    Mostrar todo
+                </button>
+
                   <hr>
                   <table class="table table-bordered">
                   <thead>
@@ -122,7 +127,7 @@ export class EmployeeComponent extends HTMLElement {
   // export function createImput(elementoPadre, iddinamico, tipo, nombre, subtexto, etiqueta, hidden)
 
   async llenarFormulario() {
-    this.oficinas = await getData("oficina");
+    this.oficinas = await getData("api/offices");
     createImput(this.formulario, "", "text", "id", "", "input", true);
 
     createImput(this.formulario, "", "text", "first_name", "Name", "input");
