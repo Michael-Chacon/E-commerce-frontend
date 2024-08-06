@@ -111,7 +111,7 @@ export class StatusComponent extends HTMLElement {
       const data = Object.fromEntries(inputs);
 
       if (data.id !== "") {
-        const respuesta = await updateData(data, this.endPoint, data.id);
+        const respuesta = await updateData(data, this.endPoint, data.id);c
         console.log(respuesta.status);
       } else if (data.id === "") {
         const respuesta = await postData(data, this.endPoint);

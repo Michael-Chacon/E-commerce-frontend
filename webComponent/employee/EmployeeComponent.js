@@ -17,7 +17,7 @@ import {
 } from "../../repository/api.js";
 
 export class EmployeeComponent extends HTMLElement {
-  endPoint = "empleado";
+  endPoint = "api/employees";
   constructor() {
     super();
     this.render();
@@ -33,7 +33,7 @@ export class EmployeeComponent extends HTMLElement {
   }
 
   render() {
-    this.innerHTML = /*html*/`
+    this.innerHTML = /*html*/ `
           <div class="container " style="margin-top: 20px;">
           <div class="row padre">
               <div class="col-12 hija2 shadow p-3 mb-5 bg-body rounded">
@@ -122,16 +122,16 @@ export class EmployeeComponent extends HTMLElement {
   // export function createImput(elementoPadre, iddinamico, tipo, nombre, subtexto, etiqueta, hidden)
 
   async llenarFormulario() {
-    this.oficinas = await getData("oficina");
+    this.oficinas = await getData("api/offices");
     createImput(this.formulario, "", "text", "id", "", "input", true);
 
-    createImput(this.formulario, "", "text", "first_name", "Name", "input");
+    createImput(this.formulario, "", "text", "firstName", "Name", "input");
 
     createImput(
       this.formulario,
       "",
       "text",
-      "last_name1",
+      "lastName1",
       "First last name",
       "input"
     );
@@ -140,20 +140,29 @@ export class EmployeeComponent extends HTMLElement {
       this.formulario,
       "",
       "text",
-      "last_name2",
+      "lastName2",
       "Second last name",
       "input"
     );
 
     createImput(this.formulario, "", "email", "email", "Email", "input");
 
-    createSelect(
-      this.formulario,
-      "",
-      "office_code",
-      "Office code",
-      this.oficinas.data
-    );
+    const select = document.createElement("select");
+    select.classList.add("form-select", "mb-3");
+    select.setAttribute("id", "");
+    select.setAttribute("name", "office_id");
+    select.setAttribute("required", true);
+    select.setAttribute("aria-label", "Default select example");
+
+    // console.log(data)
+    this.oficinas.data.forEach((item) => {
+      const option = document.createElement("option");
+      option.value = item.id;
+      option.textContent = item.address.city.name;
+      select.appendChild(option);
+    });
+
+    this.formulario.appendChild(select);
 
     const botones = document.createElement("div");
     botones.innerHTML = `
@@ -171,7 +180,8 @@ export class EmployeeComponent extends HTMLElement {
 
       const inputs = new FormData(this.formulario);
       const data = Object.fromEntries(inputs);
-
+      data.office = { id: parseInt(data.office_id) };
+      console.log(data);
       if (data.id !== "") {
         const respuesta = await updateData(data, this.endPoint, data.id);
         console.log(respuesta.status);
@@ -200,16 +210,14 @@ export class EmployeeComponent extends HTMLElement {
     const cuerpoTabal = document.querySelector("#info-tabla");
     cuerpoTabal.innerHTML = "";
     this.datos.data.forEach((dato) => {
-      const { email, first_name, id, last_name1, last_name2, office_code } =
-        dato;
+      const { email, firstName, id, lastName1, lastName2, office } = dato;
       cuerpoTabal.innerHTML += /*html*/ `
                 <tr>
                 <th scope="row">${id}</th>
-                <td>${first_name}</td>
-                <td>${last_name1}</td>
-                <td>${last_name2}</td>
-                <td>${email}</td>
-                <td>${office_code}</td>
+                <td>${firstName}</td>
+                <td>${lastName1}</td>
+                <td>${lastName2}</td>
+                <td>${office.address.city.name}</td>
                 <td class="text-center"><a href="#" "><i class='bx bx-pencil icon-actions editar' id="${id}"></i></a></td>
                 <td class="text-center"><i class='bx bx-trash-alt icon-actions eliminar' id="${id}"></i></td>
               </tr>
