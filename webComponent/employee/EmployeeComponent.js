@@ -99,27 +99,15 @@ export class EmployeeComponent extends HTMLElement {
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
               </div>
               <div class="modal-body">
-                <form id="gamaProducto">
+                <form id="empleadoOficina">
+              
                 </form>
               </div>
             </div>
           </div>
         </div>
 
-        <div class="modal fade" id="filtroPedidoAsignado" data-bs-backdrop="static" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-          <div class="modal-dialog">
-            <div class="modal-content">
-              <div class="modal-header">
-                <h5 class="modal-title" id="exampleModalLabel">Consultar empleados por pedidos asignados</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-              </div>
-              <div class="modal-body">
-                <form id="stockProducto">
-                </form>
-              </div>
-            </div>
-          </div>
-        </div>
+        
           `;
   }
 
@@ -148,6 +136,14 @@ export class EmployeeComponent extends HTMLElement {
       "lastName2",
       "Second last name",
       "input"
+    );
+
+    createSelect(
+      document.querySelector("#empleadoOficina"),
+      "",
+      "office",
+      "",
+      this.oficinas.data
     );
 
     createImput(this.formulario, "", "email", "email", "Email", "input");

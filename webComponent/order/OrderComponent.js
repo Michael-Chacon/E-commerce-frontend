@@ -17,7 +17,7 @@ import {
 } from "../../repository/api.js";
 
 export class OrderComponent extends HTMLElement {
-  endPoint = "pedido";
+  endPoint = "api/nOrders";
 
   constructor() {
     super();
@@ -45,13 +45,20 @@ export class OrderComponent extends HTMLElement {
                 </button>
 
                 <button type="button" class="btn btn-outline-secondary btn-sm" data-bs-toggle="modal" data-bs-target="#filtroEstado">
-                    Filtrar por estado
+                  Filtrar por estado
                 </button>
 
                 <button type="button" class="btn btn-outline-success btn-sm" data-bs-toggle="modal" data-bs-target="#filtroRangoFecha">
-                    Filtrar por rango de fechas
+                  Filtrar por rango de fechas
                 </button>
 
+                <button type="button" class="btn btn-outline-success btn-sm" data-bs-toggle="modal" data-bs-target="#filtroRangoFecha">
+                  Pedidos asignados a empleados
+                </button>
+
+                <button type="button" class="btn btn-outline-danger btn-sm">
+                    Mostrar todo
+                </button>
 
                   <hr>
                   <table class="table table-bordered">
@@ -97,7 +104,7 @@ export class OrderComponent extends HTMLElement {
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
               </div>
               <div class="modal-body">
-                <form id="gamaProducto">
+                <form id="ordenStatus">
                 </form>
               </div>
             </div>
@@ -112,7 +119,22 @@ export class OrderComponent extends HTMLElement {
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
               </div>
               <div class="modal-body">
-                <form id="stockProducto">
+                <form id="rangoFecha">
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="modal fade" id="filtroPedidoAsignado" data-bs-backdrop="static" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+          <div class="modal-dialog">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Consultar pedidos asignados a empleados</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+              </div>
+              <div class="modal-body">
+                <form id="pedidosEmpleado">
                 </form>
               </div>
             </div>
@@ -126,8 +148,8 @@ export class OrderComponent extends HTMLElement {
   // export function createImput(elementoPadre, iddinamico, tipo, nombre, subtexto, etiqueta, hidden)
 
   async llenarFormulario() {
-    this.status = await getData("estado");
-    this.cliente = await getData("cliente");
+    this.status = await getData("api/status");
+    this.cliente = await getData("api/customers");
     createImput(this.formulario, "", "text", "id", "", "input", true);
 
     createSelect(
@@ -166,6 +188,32 @@ export class OrderComponent extends HTMLElement {
     );
 
     createSelect(this.formulario, "", "status_code_or", "status", this.status.data);
+
+    createSelect(
+      document.querySelector("#ordenStatus"),
+      "",
+      "Status",
+      "",
+      this.status.data
+    )
+
+    createImput(
+      document.querySelector("#rangoFecha"),
+      "",
+      "date",
+      "Fecha inicio",
+      "Order date",
+      "input"
+    );
+
+    createImput(
+      document.querySelector("#rangoFecha"),
+      "",
+      "date",
+      "Fecha fin",
+      "Order date",
+      "input"
+    );
 
     createImput(
       this.formulario,
