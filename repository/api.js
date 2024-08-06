@@ -103,6 +103,7 @@ export async function postData(data, endpoint) {
     }
 
     const responseData = await response.json();
+    console.log(responseData)
     return { success: true, status: response.status, data: responseData };
   } catch (error) {
     // Manejar errores de red u otros errores

@@ -137,13 +137,6 @@ export class OfficeComponent extends HTMLElement {
       const inputs = new FormData(this.formulario);
       const data = Object.fromEntries(inputs);
       console.log(data)
-      // data.address = {
-      //   addressLine1: data.addressLine1,
-      //   addressLine2: data.addressLine2,
-      //   city: { id: data.city },
-      // };
-      // data.officeCodePh = { number: data.number };
-      // console.log(data);
       const obj = {
         id: data.id,
         address: {
@@ -152,7 +145,7 @@ export class OfficeComponent extends HTMLElement {
           addressLine2: data.addressLine2,
           city: { id: parseInt(data.city), },
         },
-        officeCodePh: { number: parseInt(data.number), },
+        phones: [{ number: parseInt(data.number), }],
       };
        console.log(obj)
       if (obj.id !== "") {
@@ -160,6 +153,7 @@ export class OfficeComponent extends HTMLElement {
         console.log(respuesta.status);
       } else if (obj.id === "") {
         const respuesta = await postData(obj, this.endPoint);
+        this.guardarTelefono(respuesta, data.number)
         console.log(respuesta.status);
       } else {
         console.log("Error metodo registrar");
@@ -170,6 +164,15 @@ export class OfficeComponent extends HTMLElement {
       this.tabla();
       this.formulario.reset();
     });
+  }
+
+  async guardarTelefono(oficina, numero){
+    const obj = {
+      officeCodePh: {"id": oficina.data.id},
+      number: parseInt(numero),
+    }
+      const telefon = await postData(obj, "api/phones")
+      console.log(telefon.data.status)
   }
 
   async tabla() {
@@ -183,20 +186,21 @@ export class OfficeComponent extends HTMLElement {
     }
     const cuerpoTabal = document.querySelector("#info-tabla");
     cuerpoTabal.innerHTML = "";
-    this.datos.data.forEach((dato) => {
-      const { address, id, number } = dato;
+    for (const dato of this.datos.data) {
+      const { address, id } = dato;
+      const numero = await this.obtenerNumero(id);
       cuerpoTabal.innerHTML += /*html*/ `
-              <tr>
-              <th scope="row">${id}</th>
-              <td>${address.city.name}</td>
-              <td>${address.addressLine1}</td>
-              <td>${address.addressLine2}</td>
-              <td>${number}</td>
-              <td class="text-center"><a href="#" "><i class='bx bx-pencil icon-actions editar' id="${id}"></i></a></td>
-              <td class="text-center"><i class='bx bx-trash-alt icon-actions eliminar' id="${id}"></i></td>
-            </tr>
-          `;
-    });
+        <tr>
+          <th scope="row">${id}</th>
+          <td>${address.city.name}</td>
+          <td>${address.addressLine1}</td>
+          <td>${address.addressLine2}</td>
+          <td>${numero}</td>
+          <td class="text-center"><a href="#" "><i class='bx bx-pencil icon-actions editar' id="${id}"></i></a></td>
+          <td class="text-center"><i class='bx bx-trash-alt icon-actions eliminar' id="${id}"></i></td>
+        </tr>
+      `;
+    }
   }
 
   detectarId() {
@@ -207,7 +211,7 @@ export class OfficeComponent extends HTMLElement {
       if (e.target.classList.contains("editar")) {
 
         const objeto = await this.buscarObjecto(idOffice);
-
+        
         console.log(objeto);
         objeto.x = objeto.address.city.id;
         objeto.iddir = objeto.address.id;
@@ -227,8 +231,9 @@ export class OfficeComponent extends HTMLElement {
           addressLine2,
           iddir,
         };
+        console.log(id)
         datosend.city = x;
-        // console.log(datosend);
+        datosend.number = await this.obtenerNumero(id);
         
         poblarFormulario(datosend, this.formulario, this.modal);
       } else if (e.target.classList.contains("eliminar")) {
@@ -241,6 +246,12 @@ export class OfficeComponent extends HTMLElement {
         console.log("Este elemento no tiene la clase");
       }
     });
+  }
+
+  async obtenerNumero(idOficina){
+    const telefono = await getOneData(idOficina, "api/phones")
+    console.log(telefono.number)
+    return telefono.number
   }
 
   async buscarObjecto(id) {
