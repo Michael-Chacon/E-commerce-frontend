@@ -121,10 +121,8 @@ export class GamaComponent extends HTMLElement {
 
       if (data.id !== "") {
         const respuesta = await updateData(data, this.endPoint, data.id);
-        console.log(respuesta.status);
       } else if (data.id === "") {
         const respuesta = await postData(data, this.endPoint);
-        console.log(respuesta.status);
       } else {
         console.log("Error al detectar el tipo de acción");
       }

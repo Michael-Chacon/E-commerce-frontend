@@ -170,7 +170,23 @@ export class ProductComponent extends HTMLElement {
       "input"
     );
 
-    createSelect(this.formulario, "", "rangeCode", "Office code", this.gama.data);
+    const selectCliente = document.createElement("div");
+    selectCliente.innerHTML = `
+    <label for="rangeCode" class="form-label mt-3">rangeCode</label>
+    <select class="form-select " name="rangeCode" id="rangeCode" required aria-label="Employees">
+        <option>Gamas</option>
+    </select>
+    `;
+    this.formulario.appendChild(selectCliente);
+
+    const padreCliente = document.querySelector("#rangeCode");
+    this.gama.data.forEach((item) => {
+      const option = document.createElement("option");
+      option.value = item.id;
+      option.textContent = item.name;
+      padreCliente.appendChild(option);
+    });
+    // createSelect(this.formulario, "", "rangeCode", "Office code", this.gama.data);
 
     const botones = document.createElement("div");
     botones.innerHTML = `
@@ -228,7 +244,6 @@ export class ProductComponent extends HTMLElement {
   async tabla() {
     const contenedor = document.querySelector(".contenedor");
     this.datos = await getData(this.endPoint, "");
-    console.log(this.datos)
     if (this.datos.data.length === 0) {
       alertaGenerica("No registered status ", contenedor);
     } else {
@@ -259,6 +274,7 @@ export class ProductComponent extends HTMLElement {
       const id = e.target.id;
       if (e.target.classList.contains("editar")) {
         const objeto = await this.buscarObjecto(id);
+        objeto.rangeCode = objeto.rangeCode.id
         poblarFormulario(objeto, this.formulario, this.modal);
       } else if (e.target.classList.contains("eliminar")) {
         if (pedirConfirmacion("este producto")) {
