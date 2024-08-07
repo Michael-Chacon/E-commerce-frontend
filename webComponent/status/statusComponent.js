@@ -111,7 +111,7 @@ export class StatusComponent extends HTMLElement {
       const data = Object.fromEntries(inputs);
 
       if (data.id !== "") {
-        const respuesta = await updateData(data, this.endPoint, data.id);c
+        const respuesta = await updateData(data, this.endPoint, data.id);
         console.log(respuesta.status);
       } else if (data.id === "") {
         const respuesta = await postData(data, this.endPoint);
@@ -157,7 +157,7 @@ export class StatusComponent extends HTMLElement {
       const id = e.target.id;
       if (e.target.classList.contains("editar")) {
         const objeto = await this.buscarObjecto(id);
-        console.log(objeto)
+        
         poblarFormulario(objeto, this.formulario, this.modal);
       } else if (e.target.classList.contains("eliminar")) {
         if (pedirConfirmacion("este estado")) {
