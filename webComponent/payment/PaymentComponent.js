@@ -35,7 +35,7 @@ export class PaymentComponent extends HTMLElement {
   }
 
   render() {
-    this.innerHTML = /*html*/`
+    this.innerHTML = /*html*/ `
           <div class="container " style="margin-top: 20px;">
           <div class="row padre">
               <div class="col">
@@ -127,20 +127,54 @@ export class PaymentComponent extends HTMLElement {
   // export function createImput(elementoPadre, iddinamico, tipo, nombre, subtexto, etiqueta, hidden)
 
   async llenarFormulario() {
-    this.metodo = await getData("api/payment-methods")
-    this.cliente = await getData("api/customers")
+    this.metodo = await getData("api/payment-methods");
+    this.cliente = await getData("api/customers");
+
+    const selectMetodo = document.createElement("div");
+    selectMetodo.innerHTML = `
+    <label for="exampleInputEmail1" class="form-label mt-3">Payment method</label>
+    <select class="form-select " name="paymentMethod" id="paymentMethod" required aria-label="Employees">
+        <option>Seleccione el metodo de pago</option>
+    </select>
+    `;
+    this.formulario.appendChild(selectMetodo);
+
+    const padreMetodo = document.querySelector("#paymentMethod");
+    this.metodo.data.forEach((item) => {
+      const option = document.createElement("option");
+      option.value = item.id;
+      option.textContent = item.methodName;
+      padreMetodo.appendChild(option);
+    });
+
+    const selectCliente = document.createElement("div");
+    selectCliente.innerHTML = `
+    <label for="customer" class="form-label mt-3">Customer</label>
+    <select class="form-select " name="customer" id="customer" required aria-label="Employees">
+        <option>Cliente que paga</option>
+    </select>
+    `;
+    this.formulario.appendChild(selectCliente);
+
+    const padreCliente = document.querySelector("#customer");
+    this.cliente.data.forEach((item) => {
+      const option = document.createElement("option");
+      option.value = item.id;
+      option.textContent = `${item.firstName} ${item.lastName1}`;
+      padreCliente.appendChild(option);
+    });
 
     createImput(this.formulario, "", "text", "id", "", "input", true);
 
-    createSelect(
-      this.formulario,
-      "",
-      "customer_code_pa",
-      "customer",
-      this.cliente.data
-    );
+    // createSelect(
+    //   this.formulario,
+    //   "",
+    //   "customer_code_pa",
+    //   "customer",
+    //   this.cliente.data
+    // );
 
-    createSelect(this.formulario, "", "payment_method", "Metodo", this.metodo.data);
+    // createSelect(this.formulario, "", "payment_method", "Metodo", this.metodo.data);
 
     createImput(
       this.formulario,
@@ -155,25 +189,9 @@ export class PaymentComponent extends HTMLElement {
       this.formulario,
       "",
       "date",
-      "payment_date",
+      "paymentDate",
       "Date of payment",
       "input"
-    );
-
-    createSelect(
-      document.querySelector("#pagoCliente"),
-      "",
-      "Cliente",
-      "",
-      this.cliente.data
-    );
-
-    createSelect(
-      document.querySelector("#pagoMetodo"),
-      "",
-      "Métodos de pago",
-      "",
-      this.metodo.data
     );
 
     const botones = document.createElement("div");
@@ -210,13 +228,18 @@ export class PaymentComponent extends HTMLElement {
 
       const inputs = new FormData(this.formulario);
       const data = Object.fromEntries(inputs);
-
+      const obj = {
+        paymentDate: data.paymentDate,
+        paymentMethod: { id: parseInt(data.paymentMethod) }, // Representa la relación con paymentMethod
+        total: 120000,
+        customer: { id: parseInt(data.customer) }, // Representa la relación con customer
+      };
+      console.log(obj);
       if (data.id !== "") {
-        const respuesta = await updateData(data, this.endPoint, data.id);
+        const respuesta = await updateData(obj, this.endPoint, data.id);
         console.log(respuesta.status);
       } else if (data.id === "") {
-        data.id = parseInt(this.datos.data.length + 1);
-        const respuesta = await postData(data, this.endPoint);
+        const respuesta = await postData(obj, this.endPoint);
         console.log(respuesta.status);
       } else {
         console.log("Error metodo registrar");
@@ -232,6 +255,7 @@ export class PaymentComponent extends HTMLElement {
   async tabla() {
     const contenedor = document.querySelector(".contenedor");
     this.datos = await getData(this.endPoint, "");
+    console.log(this.datos.data);
     if (this.datos.data.length === 0) {
       alertaGenerica("No registered payments ", contenedor);
     } else {
@@ -240,16 +264,15 @@ export class PaymentComponent extends HTMLElement {
     const cuerpoTabal = document.querySelector("#info-tabla");
     cuerpoTabal.innerHTML = "";
     this.datos.data.forEach((dato) => {
-      const { payment_date, total, payment_method, id, customer_code_pa } =
-        dato;
+      const { paymentDate, total, paymentMethod, id, customer } = dato;
       cuerpoTabal.innerHTML += /*html*/ `
                 <tr>
                 <th scope="row">${id}</th>
-                <td>${customer_code_pa}</td>
+                <td>${customer.firstName} ${customer.lastName1}</td>
                 <td>${total}</td>
-                <td>${payment_method}</td>
-                <td>${payment_date}</td>
-                <td class="text-center"><a href="#" "><i class='bx bx-pencil icon-actions editar' id="${id}"></i></a></td>
+                <td>${paymentMethod.methodName}</td>
+                <td>${paymentDate}</td>
+                <td class="text-center"><a href="#"><i class='bx bx-pencil icon-actions editar' id="${id}"></i></a></td>
                 <td class="text-center"><i class='bx bx-trash-alt icon-actions eliminar' id="${id}"></i></td>
               </tr>
             `;
@@ -263,7 +286,16 @@ export class PaymentComponent extends HTMLElement {
       const id = e.target.id;
       if (e.target.classList.contains("editar")) {
         const objeto = await this.buscarObjecto(id);
-        poblarFormulario(objeto, this.formulario, this.modal);
+        console.log(objeto);
+        const newObjs = {
+            id: objeto.id,
+            total: objeto.total,
+            paymentDate: objeto.paymentDate,
+            customer: objeto.customer.id,
+            paymentMethod: objeto.paymentMethod.id,
+        };
+        console.log(newObjs);
+        poblarFormulario(newObjs, this.formulario, this.modal);
       } else if (e.target.classList.contains("eliminar")) {
         if (pedirConfirmacion("este pago")) {
           await deleteData(id, this.endPoint);

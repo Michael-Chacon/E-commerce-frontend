@@ -224,6 +224,7 @@ export class CustomerComponent extends HTMLElement {
     </select>
     `;
     document.querySelector("#ec").appendChild(selectEmployee);
+    
     const padre = document.querySelector("#salesRep");
     this.empleados.data.forEach((item) => {
       const option = document.createElement("option");
