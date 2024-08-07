@@ -5,9 +5,19 @@ import {
   alertaGenerica,
   alertaTemporal,
   createSelect,
+  pedirConfirmacion,
 } from "../../js/utils/form.js";
 
+import {
+  deleteData,
+  getData,
+  getOneData,
+  postData,
+  updateData,
+} from "../../repository/api.js";
+
 export class OrderDetailComponent extends HTMLElement {
+  endPoint = "api/orderDetails";
   constructor() {
     super();
     this.idOrder = this.getAttribute("idOrder");
@@ -15,16 +25,13 @@ export class OrderDetailComponent extends HTMLElement {
     this.formulario = document.querySelector("#formGama");
     this.modal = document.querySelector("#modal");
     this.datos = [];
-    this.cliente = [
-      { id: 1, name: "Teclado" },
-      { id: 2, name: "Monitor" },
-      { id: 3, name: "Desktop" },
-    ];
+    this.cliente = [];
     this.llenarFormulario();
     this.registrar();
     this.detectarId();
     this.tabla();
     this.alerta = document.querySelector(".alerta");
+    this.llenarCards();
   }
 
   render() {
@@ -42,15 +49,15 @@ export class OrderDetailComponent extends HTMLElement {
                       <tbody>
                         <tr>
                           <th scope="row">Order date</th>
-                          <td>10/10/2025</td>
+                          <td id="ordenado"></td>
                         </tr>
                         <tr>
                           <th scope="row">Status</th>
-                          <td>Send</td>
+                          <td id="estado"></td>
                         </tr>
                         <tr>
                           <th scope="row">Delivery date</th>
-                          <td>Send</td>
+                          <td id="entregado"></td>
                         </tr>
                       </tbody>
                     </table>
@@ -65,15 +72,15 @@ export class OrderDetailComponent extends HTMLElement {
                         <tbody>
                           <tr>
                             <th scope="row">Name</th>
-                            <td>Mark</td>
+                            <td id="nombrec"></td>
                           </tr>
                           <tr>
                             <th scope="row">Emain</th>
-                            <td>alexis@gmail.com</td>
+                            <td id="emailc"></td>
                           </tr>
                           <tr>
-                            <th scope="row">Phone</th>
-                            <td>1234567890</td>
+                            <th scope="row">City</th>
+                            <td id="ciudadc"></td>
                           </tr>
                         </tbody>
                       </table>
@@ -115,7 +122,7 @@ export class OrderDetailComponent extends HTMLElement {
           </div>
           <!-- Modal -->
           <div class="modal fade" id="modal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
-              <div class="modal-dialog modal-sm">
+              <div class="modal-dialog ">
               <div class="modal-content">
                   <div class="modal-header">
                   <h5 class="modal-title" id="staticBackdropLabel">New product</h5>
@@ -134,16 +141,50 @@ export class OrderDetailComponent extends HTMLElement {
   // --------------------------- metodos ----------------------------------------------------
   // export function createImput(elementoPadre, iddinamico, tipo, nombre, subtexto, etiqueta, hidden)
 
-  llenarFormulario() {
-    createImput(this.formulario, "", "text", "id", "", "input", true);
+  async llenarCards() {
+    const pedido = await getOneData(this.idOrder, "api/nOrders");
+    document.querySelector("#ordenado").textContent = pedido.orderDate;
+    document.querySelector("#estado").textContent =
+      pedido.statusCodeOr.statusName;
+    document.querySelector("#entregado").textContent = pedido.deliveryDate;
+    document.querySelector(
+      "#nombrec"
+    ).textContent = `${pedido.customerCodeOr.firstName} ${pedido.customerCodeOr.lastName1}`;
+    document.querySelector("#emailc").textContent = pedido.customerCodeOr.email;
+    document.querySelector("#ciudadc").textContent =
+      pedido.customerCodeOr.city.name;
+  }
 
-    createSelect(
-      this.formulario,
-      "",
-      "producto_id_order",
-      "customer",
-      this.cliente
-    );
+  async llenarFormulario() {
+    const productos = await getData("api/products");
+    console.log(productos);
+    createImput(this.formulario, "", "text", "id", "", "input", true);
+    // createImput(
+    //   this.formulario,
+    //   this.idOrder,
+    //   "text",
+    //   "orderIdProduct",
+    //   "",
+    //   "input",
+    //   true
+    // );
+
+    const selectProduc = document.createElement("div");
+    selectProduc.innerHTML = `
+    <label for="productIdOrder" class="form-label mt-3">Products</label>
+    <select class="form-select " name="productIdOrder" id="productIdOrder" required aria-label="Employees">
+        <option>Select the product</option>
+    </select>
+    `;
+    this.formulario.appendChild(selectProduc);
+
+    const padreProducto = document.querySelector("#productIdOrder");
+    productos.data.forEach((item) => {
+      const option = document.createElement("option");
+      option.value = item.id;
+      option.textContent = `${item.name} - $${item.salePrice}`;
+      padreProducto.appendChild(option);
+    });
 
     createImput(
       this.formulario,
@@ -165,17 +206,24 @@ export class OrderDetailComponent extends HTMLElement {
   }
 
   registrar() {
-    this.formulario.addEventListener("submit", (e) => {
+    this.formulario.addEventListener("submit", async (e) => {
       e.preventDefault();
 
       const inputs = new FormData(this.formulario);
       const data = Object.fromEntries(inputs);
-
+      console.log(data);
+      const getProdut = await getOneData(data.productIdOrder, "api/products");
+      console.log(getProdut);
+      data.unitPrice = getProdut.salePrice;
+      data.orderIdProduct = { id: parseInt(this.idOrder) };
+      data.productIdOrder = { id: parseInt(data.productIdOrder) };
+      console.log(data);
       if (data.id !== "") {
-        this.actualizarData(data);
+        const respuesta = await updateData(data, this.endPoint, data.id);
+        console.log(respuesta.status);
       } else if (data.id === "") {
-        data.id = this.datos.length + 1;
-        this.datos.push(data);
+        const respuesta = await postData(data, this.endPoint);
+        console.log(respuesta.status);
       } else {
         console.log("Error metodo registrar");
       }
@@ -187,8 +235,10 @@ export class OrderDetailComponent extends HTMLElement {
     });
   }
 
-  tabla() {
+  async tabla() {
     const contenedor = document.querySelector(".contenedor");
+    this.datos = await getData(this.endPoint, "");
+    console.log(this.datos.data);
     if (this.datos.length === 0) {
       alertaGenerica("No registered ", contenedor);
     } else {
@@ -196,54 +246,61 @@ export class OrderDetailComponent extends HTMLElement {
     }
     const cuerpoTabal = document.querySelector("#info-tabla");
     cuerpoTabal.innerHTML = "";
-    this.datos.forEach((dato) => {
-      const { payment_date, total, payment_method, id, customer_code_pa } =
-        dato;
+    let contador = 0;
+    this.datos.data.forEach((dato) => {
+      const { productIdOrder, quantity, id } = dato;
       cuerpoTabal.innerHTML += /*html*/ `
                 <tr>
                 <th scope="row">${id}</th>
-                <td>${customer_code_pa}</td>
-                <td>${total}</td>
-                <td>${payment_method}</td>
-                <td>${payment_date}</td>
-                <td class="text-center"><a href="#" "><i class='bx bx-pencil icon-actions idHere' id="${id}"></i></a></td>
-                <td class="text-center"><i class='bx bx-trash-alt icon-actions'></i></td>
+                <td>${productIdOrder.name}</td>
+                <td>${quantity}</td>
+                <td>${productIdOrder.salePrice}</td>
+                <td>${quantity * productIdOrder.salePrice}</td>
+                <td class="text-center"><a href="#" "><i class='bx bx-pencil icon-actions editar' id="${id}"></i></a></td>
+                <td class="text-center"><i class='bx bx-trash-alt icon-actions eliminar' id="${id}"></i></td>
               </tr>
             `;
+            contador += quantity * productIdOrder.salePrice
     });
+
+    cuerpoTabal.innerHTML += `<tr>
+    <tr>
+      <td colspan="4"></td>
+      <th scope="row">Total</th>
+      <td>${contador}</td>
+    </tr>`
   }
 
   detectarId() {
     const cuerpoTabal = document.querySelector("#info-tabla");
-    cuerpoTabal.addEventListener("click", (e) => {
-      if (e.target.classList.contains("idHere")) {
-        e.preventDefault();
-        let id = e.target.id;
-        const objeto = this.buscarObjecto(id);
-        poblarFormulario(objeto, this.formulario, this.modal);
+    cuerpoTabal.addEventListener("click", async (e) => {
+      e.preventDefault();
+      const id = e.target.id;
+      if (e.target.classList.contains("editar")) {
+        const objeto = await this.buscarObjecto(id);
+        console.log(objeto);
+        const newObjs = {
+            id: objeto.id,
+            quantity: objeto.quantity,
+            productIdOrder: objeto.productIdOrder.id,
+        };
+        console.log(newObjs);
+        poblarFormulario(newObjs, this.formulario, this.modal);
+      } else if (e.target.classList.contains("eliminar")) {
+        if (pedirConfirmacion("este pago")) {
+          await deleteData(id, this.endPoint);
+          alertaTemporal(this.alerta, "Eliminado correctacmente", "info");
+          this.tabla();
+        }
       } else {
         console.log("Este elemento no tiene la clase");
       }
     });
   }
 
-  buscarObjecto(id) {
-    let dato = "";
-    this.datos.forEach((d) => {
-      if (d.id == id) dato = d;
-    });
+  async buscarObjecto(id) {
+    const dato = await getOneData(id, this.endPoint);
     return dato;
-  }
-
-  actualizarData(data) {
-    this.datos.forEach((d) => {
-      if (d.id == data.id) {
-        d.customer_code_pa = data.customer_code_pa;
-        d.payment_date = data.payment_date;
-        d.payment_method = data.payment_method;
-        d.total = data.total;
-      }
-    });
   }
 }
 
