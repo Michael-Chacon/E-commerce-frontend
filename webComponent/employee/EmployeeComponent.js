@@ -58,7 +58,6 @@ export class EmployeeComponent extends HTMLElement {
                       <th scope="col">Name</th>
                       <th scope="col">Last name 1</th>
                       <th scope="col">Last name 2</th>
-                      <th scope="col">Email</th>
                       <th scope="col">Office</th>
                       <th colspan="2"></th>
                       </tr>
@@ -144,22 +143,22 @@ export class EmployeeComponent extends HTMLElement {
 
     createImput(this.formulario, "", "email", "email", "Email", "input");
 
-    const select = document.createElement("select");
-    select.classList.add("form-select", "mb-3");
-    select.setAttribute("id", "");
-    select.setAttribute("name", "office_id");
-    select.setAttribute("required", true);
-    select.setAttribute("aria-label", "Default select example");
+    const selectOficina = document.createElement("div");
+    selectOficina.innerHTML = `
+    <label for="office_id" class="form-label mt-3">Office</label>
+    <select class="form-select " name="office_id" id="office_id" required aria-label="Employees">
+        <option>Cliente que paga</option>
+    </select>
+    `;
+    this.formulario.appendChild(selectOficina);
 
-    // console.log(data)
+    const padreCliente = document.querySelector("#office_id");
     this.oficinas.data.forEach((item) => {
       const option = document.createElement("option");
       option.value = item.id;
       option.textContent = item.address.city.name;
-      select.appendChild(option);
+      padreCliente.appendChild(option);
     });
-
-    this.formulario.appendChild(select);
 
     const botones = document.createElement("div");
     botones.innerHTML = `
@@ -177,7 +176,9 @@ export class EmployeeComponent extends HTMLElement {
               <button type="submit" class="btn btn-outline-dark" id="btnRegistrar">Enviar</button>
             </div>
           `;
-    document.querySelector("#empleadoOficina").appendChild(botonesempleadoOficina);
+    document
+      .querySelector("#empleadoOficina")
+      .appendChild(botonesempleadoOficina);
   }
 
   registrar() {
@@ -192,7 +193,6 @@ export class EmployeeComponent extends HTMLElement {
         const respuesta = await updateData(data, this.endPoint, data.id);
         console.log(respuesta.status);
       } else if (data.id === "") {
-        data.id = parseInt(this.datos.data.length + 1);
         const respuesta = await postData(data, this.endPoint);
         console.log(respuesta.status);
       } else {
@@ -238,6 +238,10 @@ export class EmployeeComponent extends HTMLElement {
       const id = e.target.id;
       if (e.target.classList.contains("editar")) {
         const objeto = await this.buscarObjecto(id);
+        console.log(objeto);
+        objeto.office_id = objeto.office.id;
+        delete objeto.office;
+        console.log(objeto);
         poblarFormulario(objeto, this.formulario, this.modal);
       } else if (e.target.classList.contains("eliminar")) {
         if (pedirConfirmacion("este empleado")) {
