@@ -231,7 +231,7 @@ export class PaymentComponent extends HTMLElement {
       const obj = {
         paymentDate: data.paymentDate,
         paymentMethod: { id: parseInt(data.paymentMethod) }, // Representa la relación con paymentMethod
-        total: 120000,
+        total: data.total,
         customer: { id: parseInt(data.customer) }, // Representa la relación con customer
       };
       console.log(obj);

@@ -35,7 +35,7 @@ export class OrderComponent extends HTMLElement {
   }
 
   render() {
-    this.innerHTML = /*html*/`
+    this.innerHTML = /*html*/ `
           <div class="container " style="margin-top: 20px;">
           <div class="row padre">
               <div class="col-12 hija2 shadow p-3 mb-5 bg-body rounded">
@@ -152,19 +152,28 @@ export class OrderComponent extends HTMLElement {
     this.cliente = await getData("api/customers");
     createImput(this.formulario, "", "text", "id", "", "input", true);
 
-    createSelect(
-      this.formulario,
-      "",
-      "customer_code_or",
-      "customer",
-      this.cliente.data
-    );
+    const selectCliente = document.createElement("div");
+    selectCliente.innerHTML = `
+    <label for="customerCodeOr" class="form-label mt-3">Cliente</label>
+    <select class="form-select " name="customerCodeOr" id="customerCodeOr" required aria-label="Employees">
+        <option>Cliente que paga</option>
+    </select>
+    `;
+    this.formulario.appendChild(selectCliente);
+
+    const padreCliente = document.querySelector("#customerCodeOr");
+    this.cliente.data.forEach((item) => {
+      const option = document.createElement("option");
+      option.value = item.id;
+      option.textContent = `${item.firstName} ${item.lastName1}`;
+      padreCliente.appendChild(option);
+    });
 
     createImput(
       this.formulario,
       "",
       "date",
-      "order_date",
+      "orderDate",
       "Order date",
       "input"
     );
@@ -173,7 +182,7 @@ export class OrderComponent extends HTMLElement {
       this.formulario,
       "",
       "date",
-      "expected_date",
+      "expectedDate",
       "Expected date",
       "input"
     );
@@ -182,19 +191,9 @@ export class OrderComponent extends HTMLElement {
       this.formulario,
       "",
       "date",
-      "delivery_date",
+      "deliveryDate",
       "Delivery date",
       "input"
-    );
-
-  
-
-    createSelect(
-      document.querySelector("#ordenStatus"),
-      "",
-      "Status",
-      "",
-      this.status.data
     );
 
     createImput(
@@ -224,17 +223,22 @@ export class OrderComponent extends HTMLElement {
       "textarea"
     );
 
-    createSelect(
-      document.querySelector("#pedidosEmpleado"),
-      "",
-      "Empleado",
-      "",
-      this.status.data
-    );
+    const selectStatus = document.createElement("div");
+    selectStatus.innerHTML = `
+    <label for="statusCodeOr" class="form-label mt-3">Status</label>
+    <select class="form-select " name="statusCodeOr" id="statusCodeOr" required aria-label="Employees">
+        <option>Status</option>
+    </select>
+    `;
+    this.formulario.appendChild(selectStatus);
 
-    createSelect(this.formulario, "", "status_code_or", "status", this.status.data);
-
-
+    const padreStatus = document.querySelector("#statusCodeOr");
+    this.status.data.forEach((item) => {
+      const option = document.createElement("option");
+      option.value = item.id;
+      option.textContent = item.statusName;
+      padreStatus.appendChild(option);
+    });
 
     const botones = document.createElement("div");
     botones.innerHTML = `
@@ -270,7 +274,9 @@ export class OrderComponent extends HTMLElement {
               <button type="submit" class="btn btn-outline-dark" id="btnRegistrar">Enviar</button>
             </div>
           `;
-    document.querySelector("#pedidosEmpleado").appendChild(botonesPedidoEmpleado);
+    document
+      .querySelector("#pedidosEmpleado")
+      .appendChild(botonesPedidoEmpleado);
   }
 
   registrar() {
@@ -279,13 +285,28 @@ export class OrderComponent extends HTMLElement {
 
       const inputs = new FormData(this.formulario);
       const data = Object.fromEntries(inputs);
+      console.log(data);
+
+      const order = {
+        comment: data.comment,
+        customerCodeOr: {
+          id: parseInt(data.customerCodeOr),
+        },
+        deliveryDate: data.deliveryDate,
+        expectedDate: data.expectedDate,
+        id: data.id,
+        orderDate: data.orderDate,
+        statusCodeOr: {
+          id: parseInt(data.statusCodeOr), // Asumiendo que `statusCodeOr` es un objeto con un ID
+        },
+      };
+      console.log(order)
 
       if (data.id !== "") {
-        const respuesta = await updateData(data, this.endPoint, data.id);
+        const respuesta = await updateData(order, this.endPoint, data.id);
         console.log(respuesta.status);
       } else if (data.id === "") {
-        data.id = parseInt(this.datos.data.length + 1);
-        const respuesta = await postData(data, this.endPoint);
+        const respuesta = await postData(order, this.endPoint);
         console.log(respuesta.status);
       } else {
         console.log("Error metodo registrar");
@@ -311,22 +332,22 @@ export class OrderComponent extends HTMLElement {
     cuerpoTabal.innerHTML = "";
     this.datos.data.forEach((dato) => {
       const {
-        customer_code_or,
-        status_code_or,
-        delivery_date,
+        customerCodeOr,
+        statusCodeOr,
+        deliveryDate,
         id,
-        order_date,
-        expected_date,
-        comment,
+        orderDate,
+        expectedDate,
       } = dato;
+      console.log(dato)
       cuerpoTabal.innerHTML += /*html*/ `
                 <tr>
                 <th scope="row">${id}</th>
-                <td>${customer_code_or}</td>
-                <td>${status_code_or}</td>
-                <td>${order_date}</td>
-                <td>${expected_date}</td>
-                <td>${delivery_date}</td>
+                <td>${customerCodeOr.firstName}</td>
+                <td>${statusCodeOr.statusName}</td>
+                <td>${orderDate}</td>
+                <td>${expectedDate}</td>
+                <td>${deliveryDate}</td>
                 <td class="text-center"><a href="#" "><i class='bx bx-pencil icon-actions editar' id="${id}"></i></a></td>
                 <td class="text-center"><i class='bx bx-trash-alt icon-actions eliminar' id="${id}"></i></td>
                 <td class="text-center"><i class='bx bx-detail icon-actions redireccionar' id="${id}"></i></td>
@@ -342,6 +363,9 @@ export class OrderComponent extends HTMLElement {
       const id = e.target.id;
       if (e.target.classList.contains("editar")) {
         const objeto = await this.buscarObjecto(id);
+        console.log(objeto)
+        objeto.customerCodeOr = objeto.customerCodeOr.id
+        objeto.statusCodeOr = objeto.statusCodeOr.id
         poblarFormulario(objeto, this.formulario, this.modal);
       } else if (e.target.classList.contains("eliminar")) {
         if (pedirConfirmacion("esta orden")) {
