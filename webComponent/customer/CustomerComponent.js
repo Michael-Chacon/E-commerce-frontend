@@ -43,10 +43,10 @@ export class CustomerComponent extends HTMLElement {
                 <button type="button" class="btn btn-outline-dark"  data-bs-toggle="modal" data-bs-target="#modal">
                   Add customer
                 </button>
-                // <button type="button" class="btn btn-outline-secondary btn-sm" data-bs-toggle="modal" data-bs-target="#filtroCiudad">
+                <button type="button" class="btn btn-outline-secondary btn-sm" data-bs-toggle="modal" data-bs-target="#filtroCiudad">
                   Filtrar por ciudad
                 </button>
-                <button type="button" class="btn btn-outline-success btn-sm" id="#filtroPedidoPend">
+                <button type="button" class="btn btn-outline-success btn-sm" id="filtroPedidoPend">
                   Filtrar por pedidos pendientes
                 </button>
 
@@ -284,7 +284,7 @@ export class CustomerComponent extends HTMLElement {
 
       manipularModal(this.modal, "hide");
       alertaTemporal(this.alerta, "Successful process", "success");
-      this. filtros();
+      this.filtros();
       this.formulario.reset();
     });
   }
@@ -331,6 +331,30 @@ export class CustomerComponent extends HTMLElement {
       this.datos = convertedData;
       this.tabla();
     });
+
+    const pedidosPendientes = document.querySelector("#filtroPedidoPend");
+    pedidosPendientes.addEventListener("click", async (e) => {
+      e.preventDefault();
+      const data = await getData("api/customers/pending-orders");
+      console.log(data.data);
+      const convertedData = data.data.map((item) => {
+        return {
+          id: item[0],
+          firstName: item[1],
+          lastName1: item[2],
+          lastName2: item[3],
+          email: item[4],
+          city: item[5],
+          addressLine1: item[6].addressLine1,
+          addressLine2: item[6].addressLine2,
+          number: 1234,
+          salesRep: item[7].id,
+        };
+      });
+      console.log(convertedData);
+      this.datos = convertedData;
+      this.tabla();
+    });
   }
 
   async tabla() {
@@ -344,7 +368,7 @@ export class CustomerComponent extends HTMLElement {
     }
     const cuerpoTabal = document.querySelector("#info-tabla");
     cuerpoTabal.innerHTML = "";
-    console.log(this.datos)
+    console.log(this.datos);
     this.datos.forEach((dato) => {
       const { email, firstName, id, lastName1, lastName2, city, number } = dato;
       cuerpoTabal.innerHTML += /*html*/ `
@@ -374,7 +398,7 @@ export class CustomerComponent extends HTMLElement {
         if (pedirConfirmacion("este cliente")) {
           await deleteData(id, this.endPoint);
           alertaTemporal(this.alerta, "Eliminado correctacmente", "info");
-          this. filtros();
+          this.filtros();
         }
       } else {
         console.log("Este elemento no tiene la clase");
