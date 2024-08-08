@@ -30,7 +30,7 @@ export class CustomerComponent extends HTMLElement {
     this.llenarFormulario();
     this.registrar();
     this.detectarId();
-    this.tabla();
+    this.filtros();
     this.alerta = document.querySelector(".alerta");
   }
 
@@ -43,14 +43,14 @@ export class CustomerComponent extends HTMLElement {
                 <button type="button" class="btn btn-outline-dark"  data-bs-toggle="modal" data-bs-target="#modal">
                   Add customer
                 </button>
-                <button type="button" class="btn btn-outline-secondary btn-sm" data-bs-toggle="modal" data-bs-target="#filtroCiudad">
+                // <button type="button" class="btn btn-outline-secondary btn-sm" data-bs-toggle="modal" data-bs-target="#filtroCiudad">
                   Filtrar por ciudad
                 </button>
-                <button type="button" class="btn btn-outline-success btn-sm" data-bs-toggle="modal" data-bs-target="#filtroPedidoPend">
+                <button type="button" class="btn btn-outline-success btn-sm" id="#filtroPedidoPend">
                   Filtrar por pedidos pendientes
                 </button>
 
-                <button type="button" class="btn btn-outline-danger btn-sm">
+                <button type="button" class="btn btn-outline-danger btn-sm" id="mostrarTodo">
                     Mostrar todo
                 </button>
                 
@@ -224,7 +224,7 @@ export class CustomerComponent extends HTMLElement {
     </select>
     `;
     document.querySelector("#ec").appendChild(selectEmployee);
-    
+
     const padre = document.querySelector("#salesRep");
     this.empleados.data.forEach((item) => {
       const option = document.createElement("option");
@@ -258,7 +258,7 @@ export class CustomerComponent extends HTMLElement {
 
       const inputs = new FormData(this.formulario);
       const data = Object.fromEntries(inputs);
-      
+
       const information = {
         id: data.id,
         firstName: data.firstName,
@@ -273,7 +273,7 @@ export class CustomerComponent extends HTMLElement {
         },
         salesRep: { id: parseInt(data.salesRep) },
       };
-      
+
       if (data.id !== "") {
         const respuesta = await updateData(information, this.endPoint, data.id);
       } else if (data.id === "") {
@@ -284,23 +284,68 @@ export class CustomerComponent extends HTMLElement {
 
       manipularModal(this.modal, "hide");
       alertaTemporal(this.alerta, "Successful process", "success");
-      this.tabla();
+      this. filtros();
       this.formulario.reset();
+    });
+  }
+
+  async filtros() {
+    const info = await getData(this.endPoint, "");
+    this.datos = info.data;
+
+    const todo = document.querySelector("#mostrarTodo");
+    todo.addEventListener("click", async (e) => {
+      e.preventDefault();
+      const info = await getData(this.endPoint, "");
+      this.datos = info.data;
+      this.tabla();
+    });
+    this.tabla();
+
+    const filtroEstado = document.querySelector("#clienteCiudad");
+
+    filtroEstado.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const data = new FormData(filtroEstado);
+      const obj = Object.fromEntries(data);
+      console.log(obj);
+      filtroEstado.reset();
+      manipularModal(document.querySelector("#filtroCiudad"), "hide");
+      const filtro = await getData("api/customers/by-city/" + obj.city);
+      console.log(filtro.data);
+      const convertedData = filtro.data.map((item) => {
+        return {
+          id: item[0],
+          firstName: item[1],
+          lastName1: item[2],
+          lastName2: item[3],
+          email: item[4],
+          city: item[5],
+          addressLine1: item[6].addressLine1,
+          addressLine2: item[6].addressLine2,
+          number: 1234,
+          salesRep: item[7].id,
+        };
+      });
+      console.log(convertedData);
+      this.datos = convertedData;
+      this.tabla();
     });
   }
 
   async tabla() {
     const contenedor = document.querySelector(".contenedor");
-    this.datos = await getData(this.endPoint, "");
+    //this.datos = await getData(this.endPoint, "");
 
-    if (this.datos.data.length === 0) {
+    if (this.datos.length === 0) {
       alertaGenerica("No registered customer ", contenedor);
     } else {
       contenedor.innerHTML = "";
     }
     const cuerpoTabal = document.querySelector("#info-tabla");
     cuerpoTabal.innerHTML = "";
-    this.datos.data.forEach((dato) => {
+    console.log(this.datos)
+    this.datos.forEach((dato) => {
       const { email, firstName, id, lastName1, lastName2, city, number } = dato;
       cuerpoTabal.innerHTML += /*html*/ `
                 <tr>
@@ -323,12 +368,13 @@ export class CustomerComponent extends HTMLElement {
       const id = e.target.id;
       if (e.target.classList.contains("editar")) {
         const objeto = await this.buscarObjecto(id);
+        console.log(objeto);
         poblarFormulario(objeto, this.formulario, this.modal);
       } else if (e.target.classList.contains("eliminar")) {
         if (pedirConfirmacion("este cliente")) {
           await deleteData(id, this.endPoint);
           alertaTemporal(this.alerta, "Eliminado correctacmente", "info");
-          this.tabla();
+          this. filtros();
         }
       } else {
         console.log("Este elemento no tiene la clase");
@@ -338,20 +384,20 @@ export class CustomerComponent extends HTMLElement {
 
   async buscarObjecto(ida) {
     const dato = await getOneData(ida, this.endPoint);
-    
+
     const {
       id: id,
-      address: {  
+      address: {
         addressLine1,
         addressLine2,
-        city: { id: city, name: name }
+        city: { id: city, name: name },
       },
       id: officeId,
       email,
       firstName,
       lastName1,
-      lastName2, 
-    } = dato  ;
+      lastName2,
+    } = dato;
 
     const newObj = {
       officeId,
@@ -364,10 +410,10 @@ export class CustomerComponent extends HTMLElement {
       lastName1,
       lastName2,
     };
-    newObj.number = 1234
-    newObj.city = dato.city.id
-    newObj.salesRep = dato.salesRep.id
-    
+    newObj.number = 1234;
+    newObj.city = dato.city.id;
+    newObj.salesRep = dato.salesRep.id;
+
     return newObj;
   }
 }
