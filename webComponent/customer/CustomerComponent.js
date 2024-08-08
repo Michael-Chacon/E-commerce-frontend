@@ -258,7 +258,7 @@ export class CustomerComponent extends HTMLElement {
 
       const inputs = new FormData(this.formulario);
       const data = Object.fromEntries(inputs);
-      console.log(data);
+      
       const information = {
         id: data.id,
         firstName: data.firstName,
@@ -273,13 +273,11 @@ export class CustomerComponent extends HTMLElement {
         },
         salesRep: { id: parseInt(data.salesRep) },
       };
-      console.log(information)
+      
       if (data.id !== "") {
         const respuesta = await updateData(information, this.endPoint, data.id);
-        console.log(respuesta);
       } else if (data.id === "") {
         const respuesta = await postData(information, this.endPoint);
-        console.log(respuesta);
       } else {
         console.log("Error metodo registrar");
       }
@@ -340,7 +338,7 @@ export class CustomerComponent extends HTMLElement {
 
   async buscarObjecto(ida) {
     const dato = await getOneData(ida, this.endPoint);
-    console.log(dato);    
+    
     const {
       id: id,
       address: {  
@@ -369,7 +367,7 @@ export class CustomerComponent extends HTMLElement {
     newObj.number = 1234
     newObj.city = dato.city.id
     newObj.salesRep = dato.salesRep.id
-    console.log(newObj);
+    
     return newObj;
   }
 }

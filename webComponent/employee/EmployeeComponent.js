@@ -188,13 +188,10 @@ export class EmployeeComponent extends HTMLElement {
       const inputs = new FormData(this.formulario);
       const data = Object.fromEntries(inputs);
       data.office = { id: parseInt(data.office_id) };
-      console.log(data);
       if (data.id !== "") {
         const respuesta = await updateData(data, this.endPoint, data.id);
-        console.log(respuesta.status);
       } else if (data.id === "") {
         const respuesta = await postData(data, this.endPoint);
-        console.log(respuesta.status);
       } else {
         console.log("Error metodo registrar");
       }
@@ -238,10 +235,8 @@ export class EmployeeComponent extends HTMLElement {
       const id = e.target.id;
       if (e.target.classList.contains("editar")) {
         const objeto = await this.buscarObjecto(id);
-        console.log(objeto);
         objeto.office_id = objeto.office.id;
         delete objeto.office;
-        console.log(objeto);
         poblarFormulario(objeto, this.formulario, this.modal);
       } else if (e.target.classList.contains("eliminar")) {
         if (pedirConfirmacion("este empleado")) {

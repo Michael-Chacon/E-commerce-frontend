@@ -27,10 +27,12 @@ export class OrderComponent extends HTMLElement {
     this.datos = [];
     this.status = [];
     this.cliente = [];
+    this.employees = []
     this.llenarFormulario();
     this.registrar();
     this.detectarId();
-    this.tabla();
+    // this.tabla();
+    this.tablaFiltro();
     this.alerta = document.querySelector(".alerta");
   }
 
@@ -56,7 +58,7 @@ export class OrderComponent extends HTMLElement {
                   Pedidos asignados a empleados
                 </button>
 
-                <button type="button" class="btn btn-outline-danger btn-sm">
+                <button type="button" class="btn btn-outline-danger btn-sm" id="mostrarTodo">
                     Mostrar todo
                 </button>
 
@@ -150,6 +152,7 @@ export class OrderComponent extends HTMLElement {
   async llenarFormulario() {
     this.status = await getData("api/status");
     this.cliente = await getData("api/customers");
+    this.employees = await getData("api/employees")
     createImput(this.formulario, "", "text", "id", "", "input", true);
 
     const selectCliente = document.createElement("div");
@@ -167,6 +170,23 @@ export class OrderComponent extends HTMLElement {
       option.value = item.id;
       option.textContent = `${item.firstName} ${item.lastName1}`;
       padreCliente.appendChild(option);
+    });
+
+        const selectEmpleado = document.createElement("div");
+    selectEmpleado.innerHTML = `
+    <label for="filtroEmpleado" class="form-label mt-3">Cliente</label>
+    <select class="form-select " name="filtroEmpleado" id="filtroEmpleado" required aria-label="Employees">
+        <option>Empleados</option>
+    </select>
+    `;
+    document.querySelector("#pedidosEmpleado").appendChild(selectEmpleado);
+
+    const padreFiltroEmpleado = document.querySelector("#filtroEmpleado");
+    this.employees.data.forEach((item) => {
+      const option = document.createElement("option");
+      option.value = item.id;
+      option.textContent = `${item.firstName} ${item.lastName1}`;
+      padreFiltroEmpleado.appendChild(option);
     });
 
     createImput(
@@ -200,7 +220,7 @@ export class OrderComponent extends HTMLElement {
       document.querySelector("#rangoFecha"),
       "",
       "date",
-      "Fecha inicio",
+      "startDate",
       "Order date",
       "input"
     );
@@ -209,7 +229,7 @@ export class OrderComponent extends HTMLElement {
       document.querySelector("#rangoFecha"),
       "",
       "date",
-      "Fecha fin",
+      "endDate",
       "Order date",
       "input"
     );
@@ -240,6 +260,23 @@ export class OrderComponent extends HTMLElement {
       padreStatus.appendChild(option);
     });
 
+    const selectStatusfilter = document.createElement("div");
+    selectStatusfilter.innerHTML = `
+    <label for="filtroStatus" class="form-label mt-3">Status</label>
+    <select class="form-select " name="filtroStatus" id="filtroStatus" required aria-label="Employees">
+        <option>Status</option>
+    </select>
+    `;
+    document.querySelector("#ordenStatus").appendChild(selectStatusfilter);
+
+    const padreStfilter = document.querySelector("#filtroStatus");
+    this.status.data.forEach((item) => {
+      const option = document.createElement("option");
+      option.value = item.id;
+      option.textContent = item.statusName;
+      padreStfilter.appendChild(option);
+    });
+
     const botones = document.createElement("div");
     botones.innerHTML = `
             <div class="modal-footer">
@@ -253,16 +290,16 @@ export class OrderComponent extends HTMLElement {
     botonesEstado.innerHTML = `
             <div class="modal-footer">
               <button type="button" class="btn btn-outline-danger" data-bs-dismiss="modal">Cancelar</button>
-              <button type="submit" class="btn btn-outline-dark" id="btnRegistrar">Enviar</button>
+              <button type="submit" class="btn btn-outline-dark" id="filtrarStatus">Filtrar</button>
             </div>
           `;
     document.querySelector("#ordenStatus").appendChild(botonesEstado);
 
     const botonesRangoFecha = document.createElement("div");
     botonesRangoFecha.innerHTML = `
-            <div class="modal-footer">
+            <div class="modal-footer fecha" id="btnfecha">
               <button type="button" class="btn btn-outline-danger" data-bs-dismiss="modal">Cancelar</button>
-              <button type="submit" class="btn btn-outline-dark" id="btnRegistrar">Enviar</button>
+              <button type="submit" class="btn btn-outline-dark enviar" id="">Enviar</button>
             </div>
           `;
     document.querySelector("#rangoFecha").appendChild(botonesRangoFecha);
@@ -300,7 +337,7 @@ export class OrderComponent extends HTMLElement {
           id: parseInt(data.statusCodeOr), // Asumiendo que `statusCodeOr` es un objeto con un ID
         },
       };
-      console.log(order)
+      console.log(order);
 
       if (data.id !== "") {
         const respuesta = await updateData(order, this.endPoint, data.id);
@@ -319,18 +356,116 @@ export class OrderComponent extends HTMLElement {
     });
   }
 
+  async tablaFiltro() {
+    const porFecha = document.querySelector("#rangoFecha");
+    const info = await getData(this.endPoint, "");
+    this.datos = info.data;
+
+    const todo = document.querySelector("#mostrarTodo");
+    todo.addEventListener("click", async (e) => {
+      e.preventDefault();
+      const info = await getData(this.endPoint, "");
+      this.datos = info.data;
+      this.tabla();
+    });
+    this.tabla();
+
+    const filtroEstado = document.querySelector("#ordenStatus");
+
+    filtroEstado.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const data = new FormData(filtroEstado);
+      const obj = Object.fromEntries(data);
+      console.log(obj);
+      filtroEstado.reset();
+      manipularModal(document.querySelector("#filtroEstado"), "hide");
+      const filtro = await getData(
+        "api/nOrders/by-status/" + obj.filtroStatus
+      );
+      console.log(filtro.data);
+      const convertedData = filtro.data.map((item) => {
+        return {
+          id: item[0],
+          orderDate: item[1],
+          expectedDate: item[2],
+          deliveryDate: item[3],
+          customerCodeOr: item[4],
+          statusCodeOr: item[5],
+        };
+      });
+      console.log(convertedData);
+      this.datos = convertedData;
+      this.tabla();
+    });
+
+    
+    const filtrarPorFecha = document.querySelector("#rangoFecha");
+    filtrarPorFecha.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const data = new FormData(filtrarPorFecha);
+      const obj = Object.fromEntries(data);
+      console.log(obj);
+      filtrarPorFecha.reset();
+      manipularModal(document.querySelector("#filtroRangoFecha"), "hide");
+      const filtro = await getData(
+        `api/nOrders/by-range?startDate=${obj.startDate}&endDate=${obj.endDate}`
+      );
+      console.log(filtro.data);
+      const convertedData = filtro.data.map((item) => {
+        return {
+          id: item[0],
+          orderDate: item[1],
+          expectedDate: item[2],
+          deliveryDate: item[3],
+          customerCodeOr: item[4],
+          statusCodeOr: item[5],
+        };
+      });
+      console.log(convertedData);
+      this.datos = convertedData;
+      this.tabla();
+    });
+
+        const filtrarPorEmpleado = document.querySelector("#pedidosEmpleado");
+    filtrarPorEmpleado.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const data = new FormData(filtrarPorEmpleado);
+      const obj = Object.fromEntries(data);
+      console.log(obj);
+      filtrarPorEmpleado.reset();
+      manipularModal(document.querySelector("#filtroPedidoAsignado"), "hide");
+      const filtro = await getData(
+        `api/nOrders/employee/${obj.filtroEmpleado}`
+      );
+      console.log(filtro.data);
+      const convertedData = filtro.data.map((item) => {
+        return {
+          id: item[0],
+          orderDate: item[1],
+          expectedDate: item[2],
+          deliveryDate: item[3],
+          customerCodeOr: item[4],
+          statusCodeOr: item[5],
+        };
+      });
+      console.log(convertedData);
+      this.datos = convertedData;
+      this.tabla();
+    });
+
+  }
+
   async tabla() {
     const contenedor = document.querySelector(".contenedor");
-    this.datos = await getData(this.endPoint, "");
-
-    if (this.datos.data.length === 0) {
+    // console.log(this.datos)
+    if (this.datos.length === 0) {
       alertaGenerica("No registered", contenedor);
     } else {
       contenedor.innerHTML = "";
     }
     const cuerpoTabal = document.querySelector("#info-tabla");
     cuerpoTabal.innerHTML = "";
-    this.datos.data.forEach((dato) => {
+    this.datos.forEach((dato) => {
       const {
         customerCodeOr,
         statusCodeOr,
@@ -339,7 +474,7 @@ export class OrderComponent extends HTMLElement {
         orderDate,
         expectedDate,
       } = dato;
-      console.log(dato)
+
       cuerpoTabal.innerHTML += /*html*/ `
                 <tr>
                 <th scope="row">${id}</th>
@@ -363,9 +498,9 @@ export class OrderComponent extends HTMLElement {
       const id = e.target.id;
       if (e.target.classList.contains("editar")) {
         const objeto = await this.buscarObjecto(id);
-        console.log(objeto)
-        objeto.customerCodeOr = objeto.customerCodeOr.id
-        objeto.statusCodeOr = objeto.statusCodeOr.id
+        console.log(objeto);
+        objeto.customerCodeOr = objeto.customerCodeOr.id;
+        objeto.statusCodeOr = objeto.statusCodeOr.id;
         poblarFormulario(objeto, this.formulario, this.modal);
       } else if (e.target.classList.contains("eliminar")) {
         if (pedirConfirmacion("esta orden")) {
