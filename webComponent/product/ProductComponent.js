@@ -30,7 +30,7 @@ export class ProductComponent extends HTMLElement {
     this.llenarFormulario();
     this.registrar();
     this.detectarId();
-    this.tabla();
+    this.filtro();
     this.alerta = document.querySelector(".alerta");
   }
 
@@ -43,7 +43,7 @@ export class ProductComponent extends HTMLElement {
                   <button type="button" class="btn btn-outline-dark"  data-bs-toggle="modal" data-bs-target="#modal">
                     Add product
                   </button>
-
+            
                   <button type="button" class="btn btn-outline-secondary btn-sm" data-bs-toggle="modal" data-bs-target="#filtroGama">
                     Filtrar por gama
                   </button>
@@ -52,7 +52,7 @@ export class ProductComponent extends HTMLElement {
                     Filtrar por Bajo Stock
                   </button>
 
-                  <button type="button" class="btn btn-outline-danger btn-sm">
+                  <button type="button" class="btn btn-outline-danger btn-sm" id="mostrarTodo">
                     Mostrar todo
                   </button>
                   <hr>
@@ -238,6 +238,49 @@ export class ProductComponent extends HTMLElement {
       alertaTemporal(this.alerta, "Successful process", "success");
       this.tabla();
       this.formulario.reset();
+    });
+  }
+
+  async filtro(){
+    const info = await getData(this.endPoint, "");
+    this.datos = info.data;
+
+    const todo = document.querySelector("#mostrarTodo");
+    todo.addEventListener("click", async (e) => {
+      e.preventDefault();
+      const info = await getData(this.endPoint, "");
+      this.datos = info.data;
+      this.tabla();
+    });
+    this.tabla();
+
+    const filtroPorGama = document.querySelector("#gamaProducto");
+    filtroPorGama.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const data = new FormData(filtroPorGama);
+      const obj = Object.fromEntries(data);
+      console.log(obj);
+      filtroPorGama.reset();
+      manipularModal(document.querySelector("#filtroGama"), "hide");
+      const filtro = await getData("api/customers/by-city/" + obj.city);
+      console.log(filtro.data);
+      const convertedData = filtro.data.map((item) => {
+        return {
+          id: item[0],
+          firstName: item[1],
+          lastName1: item[2],
+          lastName2: item[3],
+          email: item[4],
+          city: item[5],
+          addressLine1: item[6].addressLine1,
+          addressLine2: item[6].addressLine2,
+          number: 1234,
+          salesRep: item[7].id,
+        };
+      });
+      console.log(convertedData);
+      this.datos = convertedData;
+      this.tabla();
     });
   }
 

@@ -30,7 +30,7 @@ export class PaymentComponent extends HTMLElement {
     this.llenarFormulario();
     this.registrar();
     this.detectarId();
-    this.tabla();
+    this.filtro();
     this.alerta = document.querySelector(".alerta");
   }
 
@@ -53,6 +53,10 @@ export class PaymentComponent extends HTMLElement {
                 <button type="button" class="btn btn-outline-success btn-sm" data-bs-toggle="modal" data-bs-target="#filtroMetodoPago">
                     Filtrar por método de pago
                 </button>
+
+                <button type="button" class="btn btn-outline-danger btn-sm" id="mostrarTodo">
+                    Mostrar todo
+                  </button>
 
                   <hr>
                   <table class="table table-bordered">
@@ -203,15 +207,25 @@ export class PaymentComponent extends HTMLElement {
           `;
     this.formulario.appendChild(botones);
 
-    const botonespagoCliente = document.createElement("div");
-    botonespagoCliente.innerHTML = `
-            <div class="modal-footer">
-              <button type="button" class="btn btn-outline-danger" data-bs-dismiss="modal">Cancelar</button>
-              <button type="submit" class="btn btn-outline-dark" id="btnRegistrar">Enviar</button>
-            </div>
-          `;
-    document.querySelector("#pagoCliente").appendChild(botonespagoCliente);
+    // Select payment method for filter
+    const selectFilterPayment = document.createElement("div");
+    selectFilterPayment.innerHTML = `
+        <label for="paymentMethodFilter" class="form-label mt-3">Customer</label>
+        <select class="form-select " name="paymentMethodFilter" id="paymentMethodFilter" required aria-label="Employees">
+            <option>Cliente que paga</option>
+        </select>
+        `;
+    document.querySelector("#pagoMetodo").appendChild(selectFilterPayment);
 
+    const inputPadrePayment = document.querySelector("#paymentMethodFilter");
+    this.metodo.data.forEach((item) => {
+      const option = document.createElement("option");
+      option.value = item.id;
+      option.textContent = item.methodName;
+      inputPadrePayment.appendChild(option);
+    });
+
+    // buttons for filter by payment 
     const botonesMetodoPago = document.createElement("div");
     botonesMetodoPago.innerHTML = `
             <div class="modal-footer">
@@ -220,6 +234,34 @@ export class PaymentComponent extends HTMLElement {
             </div>
           `;
     document.querySelector("#pagoMetodo").appendChild(botonesMetodoPago);
+
+    // Select customer for filter
+    const selectFilterCliente = document.createElement("div");
+    selectFilterCliente.innerHTML = `
+        <label for="filterCustomer" class="form-label mt-3">Customer</label>
+        <select class="form-select " name="filterCustomer" id="filterCustomer" required aria-label="Employees">
+            <option>Cliente que paga</option>
+        </select>
+        `;
+    document.querySelector("#pagoCliente").appendChild(selectFilterCliente);
+
+    const inputPadre = document.querySelector("#filterCustomer");
+    this.cliente.data.forEach((item) => {
+      const option = document.createElement("option");
+      option.value = item.id;
+      option.textContent = `${item.firstName} ${item.lastName1}`;
+      inputPadre.appendChild(option);
+    });
+
+    // buttons for filter by customer
+    const botonespagoCliente = document.createElement("div");
+    botonespagoCliente.innerHTML = `
+            <div class="modal-footer">
+              <button type="button" class="btn btn-outline-danger" data-bs-dismiss="modal">Cancelar</button>
+              <button type="submit" class="btn btn-outline-dark" id="btnRegistrar">Enviar</button>
+            </div>
+          `;
+    document.querySelector("#pagoCliente").appendChild(botonespagoCliente);
   }
 
   registrar() {
@@ -247,23 +289,89 @@ export class PaymentComponent extends HTMLElement {
 
       manipularModal(this.modal, "hide");
       alertaTemporal(this.alerta, "Successful process", "success");
-      this.tabla();
+      this.filtro();
       this.formulario.reset();
+    });
+  }
+
+  async filtro() {
+    const info = await getData(this.endPoint, "");
+    this.datos = info.data;
+
+    const todo = document.querySelector("#mostrarTodo");
+    todo.addEventListener("click", async (e) => {
+      e.preventDefault();
+      const info = await getData(this.endPoint, "");
+      this.datos = info.data;
+      this.tabla();
+    });
+    this.tabla();
+
+    // Filter by customer
+    const formCustomer = document.querySelector("#pagoCliente");
+    formCustomer.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const data = new FormData(formCustomer);
+      const obj = Object.fromEntries(data);
+      console.log(obj);
+      formCustomer.reset();
+      manipularModal(document.querySelector("#filtroCliente"), "hide");
+      const filtro = await getData(
+        "api/payments/by-method/" + obj.filterCustomer
+      );
+      console.log(filtro.data);
+      const convertedData = filtro.data.map((item) => {
+        return {
+          id: item[0],
+          total: item[1],
+          paymentDate: item[2],
+          paymentMethod: item[3],
+          customer: item[4],
+        };
+      });
+      console.log(convertedData);
+      this.datos = convertedData;
+      this.tabla();
+    });
+
+    // Filter by payment method
+    const formMethod = document.querySelector("#pagoMetodo");
+    formMethod.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const data = new FormData(formMethod);
+      const obj = Object.fromEntries(data);
+      console.log(obj);
+      formMethod.reset();
+      manipularModal(document.querySelector("#filtroMetodoPago"), "hide");
+      const filtro = await getData(
+        "api/payments/by-method/" + obj.paymentMethodFilter
+      );
+      console.log(filtro.data);
+      const convertedData = filtro.data.map((item) => {
+        return {
+          id: item[0],
+          total: item[1],
+          paymentDate: item[2],
+          paymentMethod: item[3],
+          customer: item[4],
+        };
+      });
+      console.log(convertedData);
+      this.datos = convertedData;
+      this.tabla();
     });
   }
 
   async tabla() {
     const contenedor = document.querySelector(".contenedor");
-    this.datos = await getData(this.endPoint, "");
-    console.log(this.datos.data);
-    if (this.datos.data.length === 0) {
+    if (this.datos.length === 0) {
       alertaGenerica("No registered payments ", contenedor);
     } else {
       contenedor.innerHTML = "";
     }
     const cuerpoTabal = document.querySelector("#info-tabla");
     cuerpoTabal.innerHTML = "";
-    this.datos.data.forEach((dato) => {
+    this.datos.forEach((dato) => {
       const { paymentDate, total, paymentMethod, id, customer } = dato;
       cuerpoTabal.innerHTML += /*html*/ `
                 <tr>
@@ -286,13 +394,12 @@ export class PaymentComponent extends HTMLElement {
       const id = e.target.id;
       if (e.target.classList.contains("editar")) {
         const objeto = await this.buscarObjecto(id);
-        console.log(objeto);
         const newObjs = {
-            id: objeto.id,
-            total: objeto.total,
-            paymentDate: objeto.paymentDate,
-            customer: objeto.customer.id,
-            paymentMethod: objeto.paymentMethod.id,
+          id: objeto.id,
+          total: objeto.total,
+          paymentDate: objeto.paymentDate,
+          customer: objeto.customer.id,
+          paymentMethod: objeto.paymentMethod.id,
         };
         console.log(newObjs);
         poblarFormulario(newObjs, this.formulario, this.modal);
@@ -300,7 +407,7 @@ export class PaymentComponent extends HTMLElement {
         if (pedirConfirmacion("este pago")) {
           await deleteData(id, this.endPoint);
           alertaTemporal(this.alerta, "Eliminado correctacmente", "info");
-          this.tabla();
+          this.filtro();
         }
       } else {
         console.log("Este elemento no tiene la clase");
