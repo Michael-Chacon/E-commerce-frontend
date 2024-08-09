@@ -127,7 +127,9 @@ export class ProductComponent extends HTMLElement {
 
   async llenarFormulario() {
     this.gama = await getData("api/productRanges");
+
     createSelect(this.filtroGama, "", "rangeCode", "", this.gama.data);
+
     createImput(
       this.filtroStock,
       "",
@@ -272,6 +274,33 @@ export class ProductComponent extends HTMLElement {
       filtroPorGama.reset();
       manipularModal(document.querySelector("#filtroGama"), "hide");
       const filtro = await getData("api/products/by-range/" + obj.rangeCode);
+      console.log(filtro.data);
+      const convertedData = filtro.data.map((item) => {
+        return {
+          id: item[0],
+          name: item[1],
+          stockQuantity: item[2],
+          salePrice: item[3],
+          rangeCode: item[4],
+          productDescription: item[5],
+          dimensions: item[6],
+        };
+      });
+      console.log(convertedData);
+      this.datos = convertedData;
+      this.tabla();
+    });
+
+    // Filter for amount in stock
+    const filterByStock = document.querySelector("#stockProducto");
+    filterByStock.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const data = new FormData(filterByStock);
+      const obj = Object.fromEntries(data);
+      console.log(obj);
+      filterByStock.reset();
+      manipularModal(document.querySelector("#filtroStock"), "hide");
+      const filtro = await getData("api/products/by-low-stock/" + obj.stockQuantity);
       console.log(filtro.data);
       const convertedData = filtro.data.map((item) => {
         return {
