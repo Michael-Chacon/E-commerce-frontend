@@ -5,7 +5,7 @@ export class MenuComponent extends HTMLElement {
   }
 
   render() {
-    this.innerHTML = /*html*/`
+    this.innerHTML = /*html*/ `
     <style rel="stylesheet">
         @import "/webComponent/menu/style.css";
     </style>
@@ -27,24 +27,14 @@ export class MenuComponent extends HTMLElement {
         </ul>
       </li>
       <li>
-      <a href="#"
+      <a href="#" class="listarClient"
         ><i class='bx bxs-user icon'></i> Clientes
-        <i class="bx bx-chevron-right icon-right"></i
-      ></a>
-      <ul class="side-dropdown">
-        <li><a href="#" class="listarClient">Listado</a></li>
-        <li><a href="#" class="asignacion asignar">Por ciudad</a></li>
-        <li><a href="#" class="asignacion retornar">Pedidos pendientes</a></li>
-      </ul>
+      </a>
     </li>
       <li>
-      <a href="#"
+      <a href="#" class="listaPedidos"
         ><i class='bx bxs-shopping-bag-alt icon'></i> Pedidos
-        <i class="bx bx-chevron-right icon-right"></i
-      ></a>
-      <ul class="side-dropdown">
-        <li><a href="#" class="listaPedidos">Listado</a></li>
-      </ul>
+      </a>
     </li>
       <li>
       <a href="#"
@@ -57,24 +47,14 @@ export class MenuComponent extends HTMLElement {
       </ul>
     </li>
     <li>
-      <a href="#"
+      <a href="#" class="listaEmpleados"
         ><i class='bx bx-male-female icon'></i> Empleados
-        <i class="bx bx-chevron-right icon-right"></i
-      ></a>
-      <ul class="side-dropdown">
-        <li><a href="#" class="listaEmpleados">Listado</a></li>
-      </ul>
+      </a>
     </li>
     <li>
-      <a href="#"
+      <a href="#" class="listaOfincinas"
         ><i class='bx bx-store-alt icon'></i> Oficinas
-        <i class="bx bx-chevron-right icon-right"></i
-      ></a>
-      <ul class="side-dropdown">
-        <li><a href="#" class="listaOfincinas">Listado</a></li>
-        <li><a href="#" class="ubicacion editar">Editar</a></li>
-        <li><a href="#" class="ubicacion eliminar">Eliminar</a></li>
-      </ul>
+      </a>
     </li>
     <li>
       <a href="#">
@@ -154,8 +134,6 @@ export class MenuComponent extends HTMLElement {
       }
     });
   }
-
-  
 }
 
 customElements.define("menu-component", MenuComponent);

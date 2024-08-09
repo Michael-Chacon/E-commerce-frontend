@@ -189,14 +189,11 @@ export class OfficeComponent extends HTMLElement {
     for (const dato of this.datos.data) {
       const { address, id } = dato;
       const n = await this.obtenerNumero(id);
-      console.log(n)
-      stop();
       let numero;
       if(n.number === null){
         numero = 888
       }
       numero = n.number;
-      console.log(numero)
       cuerpoTabal.innerHTML += /*html*/ `
         <tr>
           <th scope="row">${id}</th>

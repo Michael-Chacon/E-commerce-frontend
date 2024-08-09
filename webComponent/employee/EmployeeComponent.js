@@ -291,9 +291,13 @@ export class EmployeeComponent extends HTMLElement {
         poblarFormulario(objeto, this.formulario, this.modal);
       } else if (e.target.classList.contains("eliminar")) {
         if (pedirConfirmacion("este empleado")) {
-          await deleteData(id, this.endPoint);
-          alertaTemporal(this.alerta, "Eliminado correctacmente", "info");
-          this.tabla();
+          const response = await deleteData(id, this.endPoint);
+          if(response.success){
+            alertaTemporal(this.alerta, "Eliminado correctacmente", "info");
+          }else{
+            alertaTemporal(this.alerta, "No se puede borrar este elemento porque está relacionada con otros datos", "danger");
+          }
+          this.filtro();
         }
       } else {
         console.log("Este elemento no tiene la clase");
