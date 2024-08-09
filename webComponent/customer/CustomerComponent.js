@@ -302,41 +302,32 @@ export class CustomerComponent extends HTMLElement {
     });
     this.tabla();
 
+    // Filter by city
     const filtroEstado = document.querySelector("#clienteCiudad");
-
     filtroEstado.addEventListener("submit", async (e) => {
       e.preventDefault();
       const data = new FormData(filtroEstado);
       const obj = Object.fromEntries(data);
-      console.log(obj);
       filtroEstado.reset();
+
       manipularModal(document.querySelector("#filtroCiudad"), "hide");
       const filtro = await getData("api/customers/by-city/" + obj.city);
-      console.log(filtro.data);
-      const convertedData = filtro.data.map((item) => {
-        return {
-          id: item[0],
-          firstName: item[1],
-          lastName1: item[2],
-          lastName2: item[3],
-          email: item[4],
-          city: item[5],
-          addressLine1: item[6].addressLine1,
-          addressLine2: item[6].addressLine2,
-          number: 1234,
-          salesRep: item[7].id,
-        };
-      });
-      console.log(convertedData);
-      this.datos = convertedData;
+      this.dto(filtro);
       this.tabla();
     });
 
+    //Filter by pending orders
     const pedidosPendientes = document.querySelector("#filtroPedidoPend");
     pedidosPendientes.addEventListener("click", async (e) => {
       e.preventDefault();
       const data = await getData("api/customers/pending-orders");
-      console.log(data.data);
+      this.dto(data);
+      this.tabla();
+    });
+  }
+
+  dto(data) {
+    if (data.success) {
       const convertedData = data.data.map((item) => {
         return {
           id: item[0],
@@ -351,15 +342,15 @@ export class CustomerComponent extends HTMLElement {
           salesRep: item[7].id,
         };
       });
-      console.log(convertedData);
       this.datos = convertedData;
-      this.tabla();
-    });
+    } else {
+      alertaTemporal(this.alerta, "Products not found", "danger");
+      this.datos = [];
+    }
   }
 
   async tabla() {
     const contenedor = document.querySelector(".contenedor");
-    //this.datos = await getData(this.endPoint, "");
 
     if (this.datos.length === 0) {
       alertaGenerica("No registered customer ", contenedor);
@@ -442,6 +433,7 @@ export class CustomerComponent extends HTMLElement {
       lastName1,
       lastName2,
     };
+
     newObj.number = 1234;
     newObj.city = dato.city.id;
     newObj.salesRep = dato.salesRep.id;
