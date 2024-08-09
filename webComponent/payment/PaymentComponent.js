@@ -170,16 +170,6 @@ export class PaymentComponent extends HTMLElement {
 
     createImput(this.formulario, "", "text", "id", "", "input", true);
 
-    // createSelect(
-    //   this.formulario,
-    //   "",
-    //   "customer_code_pa",
-    //   "customer",
-    //   this.cliente.data
-    // );
-
-    // createSelect(this.formulario, "", "payment_method", "Metodo", this.metodo.data);
-
     createImput(
       this.formulario,
       "",
@@ -225,7 +215,7 @@ export class PaymentComponent extends HTMLElement {
       inputPadrePayment.appendChild(option);
     });
 
-    // buttons for filter by payment 
+    // buttons for filter by payment
     const botonesMetodoPago = document.createElement("div");
     botonesMetodoPago.innerHTML = `
             <div class="modal-footer">
@@ -276,13 +266,10 @@ export class PaymentComponent extends HTMLElement {
         total: data.total,
         customer: { id: parseInt(data.customer) }, // Representa la relación con customer
       };
-      console.log(obj);
       if (data.id !== "") {
-        const respuesta = await updateData(obj, this.endPoint, data.id);
-        console.log(respuesta.status);
+        await updateData(obj, this.endPoint, data.id);
       } else if (data.id === "") {
-        const respuesta = await postData(obj, this.endPoint);
-        console.log(respuesta.status);
+        await postData(obj, this.endPoint);
       } else {
         console.log("Error metodo registrar");
       }
@@ -311,26 +298,11 @@ export class PaymentComponent extends HTMLElement {
     const formCustomer = document.querySelector("#pagoCliente");
     formCustomer.addEventListener("submit", async (e) => {
       e.preventDefault();
-      const data = new FormData(formCustomer);
-      const obj = Object.fromEntries(data);
-      console.log(obj);
-      formCustomer.reset();
-      manipularModal(document.querySelector("#filtroCliente"), "hide");
+      const obj = this.getFormData(formCustomer, "#filtroCliente");
       const filtro = await getData(
         "api/payments/by-method/" + obj.filterCustomer
       );
-      console.log(filtro.data);
-      const convertedData = filtro.data.map((item) => {
-        return {
-          id: item[0],
-          total: item[1],
-          paymentDate: item[2],
-          paymentMethod: item[3],
-          customer: item[4],
-        };
-      });
-      console.log(convertedData);
-      this.datos = convertedData;
+      this.dto(filtro);
       this.tabla();
     });
 
@@ -338,16 +310,26 @@ export class PaymentComponent extends HTMLElement {
     const formMethod = document.querySelector("#pagoMetodo");
     formMethod.addEventListener("submit", async (e) => {
       e.preventDefault();
-      const data = new FormData(formMethod);
-      const obj = Object.fromEntries(data);
-      console.log(obj);
-      formMethod.reset();
-      manipularModal(document.querySelector("#filtroMetodoPago"), "hide");
+      const obj = this.getFormData(formMethod, "#filtroMetodoPago");
       const filtro = await getData(
         "api/payments/by-method/" + obj.paymentMethodFilter
       );
-      console.log(filtro.data);
-      const convertedData = filtro.data.map((item) => {
+      this.dto(filtro);
+      this.tabla();
+    });
+  }
+
+  getFormData(form, modal) {
+    const data = new FormData(form);
+    const obj = Object.fromEntries(data);
+    form.reset();
+    manipularModal(document.querySelector(modal), "hide");
+    return obj;
+  }
+
+  dto(data) {
+    if (data.success && data.data.length != 0) {
+      const convertedData = data.data.map((item) => {
         return {
           id: item[0],
           total: item[1],
@@ -356,10 +338,11 @@ export class PaymentComponent extends HTMLElement {
           customer: item[4],
         };
       });
-      console.log(convertedData);
       this.datos = convertedData;
-      this.tabla();
-    });
+    } else {
+      alertaTemporal(this.alerta, "Order not found", "danger");
+      this.datos = [];
+    }
   }
 
   async tabla() {
@@ -401,7 +384,6 @@ export class PaymentComponent extends HTMLElement {
           customer: objeto.customer.id,
           paymentMethod: objeto.paymentMethod.id,
         };
-        console.log(newObjs);
         poblarFormulario(newObjs, this.formulario, this.modal);
       } else if (e.target.classList.contains("eliminar")) {
         if (pedirConfirmacion("este pago")) {

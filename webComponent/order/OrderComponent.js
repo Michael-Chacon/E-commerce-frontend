@@ -403,7 +403,6 @@ export class OrderComponent extends HTMLElement {
   }
 
   getFormData(form, modal) {
-    console.log("obtener form");
     const data = new FormData(form);
     const obj = Object.fromEntries(data);
     form.reset();
