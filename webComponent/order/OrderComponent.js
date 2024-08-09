@@ -27,11 +27,10 @@ export class OrderComponent extends HTMLElement {
     this.datos = [];
     this.status = [];
     this.cliente = [];
-    this.employees = []
+    this.employees = [];
     this.llenarFormulario();
     this.registrar();
     this.detectarId();
-    // this.tabla();
     this.tablaFiltro();
     this.alerta = document.querySelector(".alerta");
   }
@@ -152,7 +151,7 @@ export class OrderComponent extends HTMLElement {
   async llenarFormulario() {
     this.status = await getData("api/status");
     this.cliente = await getData("api/customers");
-    this.employees = await getData("api/employees")
+    this.employees = await getData("api/employees");
     createImput(this.formulario, "", "text", "id", "", "input", true);
 
     const selectCliente = document.createElement("div");
@@ -172,7 +171,7 @@ export class OrderComponent extends HTMLElement {
       padreCliente.appendChild(option);
     });
 
-        const selectEmpleado = document.createElement("div");
+    const selectEmpleado = document.createElement("div");
     selectEmpleado.innerHTML = `
     <label for="filtroEmpleado" class="form-label mt-3">Cliente</label>
     <select class="form-select " name="filtroEmpleado" id="filtroEmpleado" required aria-label="Employees">
@@ -351,7 +350,7 @@ export class OrderComponent extends HTMLElement {
 
       manipularModal(this.modal, "hide");
       alertaTemporal(this.alerta, "Successful process", "success");
-      this.tabla();
+      this.tablaFiltro();
       this.formulario.reset();
     });
   }
@@ -379,9 +378,7 @@ export class OrderComponent extends HTMLElement {
       console.log(obj);
       filtroEstado.reset();
       manipularModal(document.querySelector("#filtroEstado"), "hide");
-      const filtro = await getData(
-        "api/nOrders/by-status/" + obj.filtroStatus
-      );
+      const filtro = await getData("api/nOrders/by-status/" + obj.filtroStatus);
       console.log(filtro.data);
       const convertedData = filtro.data.map((item) => {
         return {
@@ -398,7 +395,6 @@ export class OrderComponent extends HTMLElement {
       this.tabla();
     });
 
-    
     const filtrarPorFecha = document.querySelector("#rangoFecha");
     filtrarPorFecha.addEventListener("submit", async (e) => {
       e.preventDefault();
@@ -426,7 +422,7 @@ export class OrderComponent extends HTMLElement {
       this.tabla();
     });
 
-        const filtrarPorEmpleado = document.querySelector("#pedidosEmpleado");
+    const filtrarPorEmpleado = document.querySelector("#pedidosEmpleado");
     filtrarPorEmpleado.addEventListener("submit", async (e) => {
       e.preventDefault();
       const data = new FormData(filtrarPorEmpleado);
@@ -452,7 +448,6 @@ export class OrderComponent extends HTMLElement {
       this.datos = convertedData;
       this.tabla();
     });
-
   }
 
   async tabla() {
@@ -475,11 +470,21 @@ export class OrderComponent extends HTMLElement {
         expectedDate,
       } = dato;
 
+      let color = '';
+      if (statusCodeOr.statusName === 'Pending'){
+          color = 'danger'
+      }else if (statusCodeOr.statusName === 'Shipped'){
+        color = 'info'
+      }else if (statusCodeOr.statusName === 'Delivered'){
+        color = 'success'
+      }else{
+        color = 'Secondary'
+      }
       cuerpoTabal.innerHTML += /*html*/ `
                 <tr>
                 <th scope="row">${id}</th>
                 <td>${customerCodeOr.firstName}</td>
-                <td>${statusCodeOr.statusName}</td>
+                <td><span class="badge bg-${color}">${statusCodeOr.statusName}</span></td>
                 <td>${orderDate}</td>
                 <td>${expectedDate}</td>
                 <td>${deliveryDate}</td>
@@ -498,15 +503,22 @@ export class OrderComponent extends HTMLElement {
       const id = e.target.id;
       if (e.target.classList.contains("editar")) {
         const objeto = await this.buscarObjecto(id);
-        console.log(objeto);
         objeto.customerCodeOr = objeto.customerCodeOr.id;
         objeto.statusCodeOr = objeto.statusCodeOr.id;
         poblarFormulario(objeto, this.formulario, this.modal);
       } else if (e.target.classList.contains("eliminar")) {
         if (pedirConfirmacion("esta orden")) {
-          await deleteData(id, this.endPoint);
-          alertaTemporal(this.alerta, "Eliminado correctacmente", "info");
-          this.tabla();
+          const response = await deleteData(id, this.endPoint);
+          if (response.success) {
+            alertaTemporal(this.alerta, "Eliminado correctacmente", "info");
+          } else {
+            alertaTemporal(
+              this.alerta,
+              "No se puede borrar este elemento porque está relacionada con otros datos",
+              "danger"
+            );
+          }
+          this.filtro();
         }
       } else if (e.target.classList.contains("redireccionar")) {
         console.log("aja", id);
