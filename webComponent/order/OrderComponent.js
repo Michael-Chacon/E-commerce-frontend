@@ -518,7 +518,7 @@ export class OrderComponent extends HTMLElement {
               "danger"
             );
           }
-          this.filtro();
+        this.tablaFiltro();
         }
       } else if (e.target.classList.contains("redireccionar")) {
         console.log("aja", id);

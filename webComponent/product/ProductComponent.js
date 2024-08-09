@@ -300,7 +300,9 @@ export class ProductComponent extends HTMLElement {
       console.log(obj);
       filterByStock.reset();
       manipularModal(document.querySelector("#filtroStock"), "hide");
-      const filtro = await getData("api/products/by-low-stock/" + obj.stockQuantity);
+      const filtro = await getData(
+        "api/products/by-low-stock/" + obj.stockQuantity
+      );
       console.log(filtro.data);
       const convertedData = filtro.data.map((item) => {
         return {
@@ -357,8 +359,16 @@ export class ProductComponent extends HTMLElement {
         poblarFormulario(objeto, this.formulario, this.modal);
       } else if (e.target.classList.contains("eliminar")) {
         if (pedirConfirmacion("este producto")) {
-          await deleteData(id, this.endPoint);
-          alertaTemporal(this.alerta, "Eliminado correctacmente", "info");
+          const response = await deleteData(id, this.endPoint);
+          if (response.success) {
+            alertaTemporal(this.alerta, "Eliminado correctacmente", "info");
+          } else {
+            alertaTemporal(
+              this.alerta,
+              "No se puede borrar este elemento porque está relacionada con otros datos",
+              "danger"
+            );
+          }
           this.filtro();
         }
       } else {
