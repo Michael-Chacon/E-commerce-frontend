@@ -327,7 +327,7 @@ export class CustomerComponent extends HTMLElement {
   }
 
   dto(data) {
-    if (data.success) {
+    if (data.success && data.data.length != 0) {
       const convertedData = data.data.map((item) => {
         return {
           id: item[0],

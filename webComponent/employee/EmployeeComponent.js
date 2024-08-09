@@ -239,7 +239,7 @@ export class EmployeeComponent extends HTMLElement {
         "api/employees/by-office/" + obj.filterOffice
       );
 
-      if (filtro.success) {
+      if (filtro.success && data.data.length != 0) {
         const convertedData = filtro.data.map((item) => {
           return {
             id: item[0],

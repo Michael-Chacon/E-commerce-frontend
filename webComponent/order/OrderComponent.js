@@ -373,68 +373,47 @@ export class OrderComponent extends HTMLElement {
 
     filtroEstado.addEventListener("submit", async (e) => {
       e.preventDefault();
-      const data = new FormData(filtroEstado);
-      const obj = Object.fromEntries(data);
-      console.log(obj);
-      filtroEstado.reset();
-      manipularModal(document.querySelector("#filtroEstado"), "hide");
+      const obj = this.getFormData(filtroEstado, "#filtroEstado");
       const filtro = await getData("api/nOrders/by-status/" + obj.filtroStatus);
-      console.log(filtro.data);
-      const convertedData = filtro.data.map((item) => {
-        return {
-          id: item[0],
-          orderDate: item[1],
-          expectedDate: item[2],
-          deliveryDate: item[3],
-          customerCodeOr: item[4],
-          statusCodeOr: item[5],
-        };
-      });
-      console.log(convertedData);
-      this.datos = convertedData;
+      this.dto(filtro);
       this.tabla();
     });
 
     const filtrarPorFecha = document.querySelector("#rangoFecha");
     filtrarPorFecha.addEventListener("submit", async (e) => {
       e.preventDefault();
-      const data = new FormData(filtrarPorFecha);
-      const obj = Object.fromEntries(data);
-      console.log(obj);
-      filtrarPorFecha.reset();
-      manipularModal(document.querySelector("#filtroRangoFecha"), "hide");
+      const obj = this.getFormData(filtrarPorFecha, "#filtroRangoFecha");
       const filtro = await getData(
         `api/nOrders/by-range?startDate=${obj.startDate}&endDate=${obj.endDate}`
       );
-      console.log(filtro.data);
-      const convertedData = filtro.data.map((item) => {
-        return {
-          id: item[0],
-          orderDate: item[1],
-          expectedDate: item[2],
-          deliveryDate: item[3],
-          customerCodeOr: item[4],
-          statusCodeOr: item[5],
-        };
-      });
-      console.log(convertedData);
-      this.datos = convertedData;
+      this.dto(filtro);
       this.tabla();
     });
 
     const filtrarPorEmpleado = document.querySelector("#pedidosEmpleado");
     filtrarPorEmpleado.addEventListener("submit", async (e) => {
       e.preventDefault();
-      const data = new FormData(filtrarPorEmpleado);
-      const obj = Object.fromEntries(data);
-      console.log(obj);
-      filtrarPorEmpleado.reset();
-      manipularModal(document.querySelector("#filtroPedidoAsignado"), "hide");
+      const obj = this.getFormData(filtrarPorEmpleado, "#filtroPedidoAsignado");
       const filtro = await getData(
         `api/nOrders/employee/${obj.filtroEmpleado}`
       );
-      console.log(filtro.data);
-      const convertedData = filtro.data.map((item) => {
+      this.dto(filtro);
+      this.tabla();
+    });
+  }
+
+  getFormData(form, modal) {
+    console.log("obtener form");
+    const data = new FormData(form);
+    const obj = Object.fromEntries(data);
+    form.reset();
+    manipularModal(document.querySelector(modal), "hide");
+    return obj;
+  }
+
+  dto(data) {
+    if (data.success && data.data.length != 0) {
+      const convertedData = data.data.map((item) => {
         return {
           id: item[0],
           orderDate: item[1],
@@ -444,10 +423,11 @@ export class OrderComponent extends HTMLElement {
           statusCodeOr: item[5],
         };
       });
-      console.log(convertedData);
       this.datos = convertedData;
-      this.tabla();
-    });
+    } else {
+      alertaTemporal(this.alerta, "Order not found", "danger");
+      this.datos = [];
+    }
   }
 
   async tabla() {
@@ -470,16 +450,13 @@ export class OrderComponent extends HTMLElement {
         expectedDate,
       } = dato;
 
-      let color = '';
-      if (statusCodeOr.statusName === 'Pending'){
-          color = 'danger'
-      }else if (statusCodeOr.statusName === 'Shipped'){
-        color = 'info'
-      }else if (statusCodeOr.statusName === 'Delivered'){
-        color = 'success'
-      }else{
-        color = 'Secondary'
-      }
+      const statusColors = {
+        Pending: "danger",
+        Shipped: "info",
+        Delivered: "success",
+      };
+      let color = statusColors[statusCodeOr.statusName] || "Secondary";
+
       cuerpoTabal.innerHTML += /*html*/ `
                 <tr>
                 <th scope="row">${id}</th>
@@ -518,7 +495,7 @@ export class OrderComponent extends HTMLElement {
               "danger"
             );
           }
-        this.tablaFiltro();
+          this.tablaFiltro();
         }
       } else if (e.target.classList.contains("redireccionar")) {
         console.log("aja", id);
