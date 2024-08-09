@@ -28,7 +28,7 @@ export class EmployeeComponent extends HTMLElement {
     this.llenarFormulario();
     this.registrar();
     this.detectarId();
-    this.tabla();
+    this.filtro();
     this.alerta = document.querySelector(".alerta");
   }
 
@@ -46,7 +46,7 @@ export class EmployeeComponent extends HTMLElement {
                   Filtrar por Oficina
                 </button>
 
-                <button type="button" class="btn btn-outline-danger btn-sm">
+                <button type="button" class="btn btn-outline-danger btn-sm" id="mostrarTodo">
                     Mostrar todo
                 </button>
 
@@ -133,21 +133,14 @@ export class EmployeeComponent extends HTMLElement {
       "input"
     );
 
-    createSelect(
-      document.querySelector("#empleadoOficina"),
-      "",
-      "office",
-      "",
-      this.oficinas.data
-    );
-
     createImput(this.formulario, "", "email", "email", "Email", "input");
 
+    //Select office
     const selectOficina = document.createElement("div");
     selectOficina.innerHTML = `
     <label for="office_id" class="form-label mt-3">Office</label>
     <select class="form-select " name="office_id" id="office_id" required aria-label="Employees">
-        <option>Cliente que paga</option>
+        <option>Select office</option>
     </select>
     `;
     this.formulario.appendChild(selectOficina);
@@ -158,6 +151,24 @@ export class EmployeeComponent extends HTMLElement {
       option.value = item.id;
       option.textContent = item.address.city.name;
       padreCliente.appendChild(option);
+    });
+
+    //Select office for filter
+    const selectOficinaFilter = document.createElement("div");
+    selectOficinaFilter.innerHTML = `
+    <label for="filterOffice" class="form-label mt-3">Office</label>
+    <select class="form-select " name="filterOffice" id="filterOffice" required aria-label="Employees">
+        <option>Offices</option>
+    </select>
+    `;
+    document.querySelector("#empleadoOficina").appendChild(selectOficinaFilter);
+
+    const selectFilter = document.querySelector("#filterOffice");
+    this.oficinas.data.forEach((item) => {
+      const option = document.createElement("option");
+      option.value = item.id;
+      option.textContent = item.address.city.name;
+      selectFilter.appendChild(option);
     });
 
     const botones = document.createElement("div");
@@ -197,22 +208,62 @@ export class EmployeeComponent extends HTMLElement {
       }
       manipularModal(this.modal, "hide");
       alertaTemporal(this.alerta, "Successful process", "success");
-      this.tabla();
+      this.filtro();
       this.formulario.reset();
+    });
+  }
+
+  async filtro() {
+    const info = await getData(this.endPoint, "");
+    this.datos = info.data;
+
+    const todo = document.querySelector("#mostrarTodo");
+    todo.addEventListener("click", async (e) => {
+      e.preventDefault();
+      const info = await getData(this.endPoint, "");
+      this.datos = info.data;
+      this.tabla();
+    });
+    this.tabla();
+
+    // Filter by office
+    const formCustomer = document.querySelector("#empleadoOficina");
+    formCustomer.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const data = new FormData(formCustomer);
+      const obj = Object.fromEntries(data);
+      console.log(obj);
+      formCustomer.reset();
+      manipularModal(document.querySelector("#filtroOficina"), "hide");
+      const filtro = await getData(
+        "api/employees/by-office/" + obj.filterOffice
+      );
+      console.log(filtro.data);
+      const convertedData = filtro.data.map((item) => {
+        return {
+          id: item[0],
+          firstName: item[1],
+          lastName1: item[2],
+          lastName2: item[3],
+          email: item[4],
+          office: item[5],
+        };
+      });
+      this.datos = convertedData;
+      this.tabla();
     });
   }
 
   async tabla() {
     const contenedor = document.querySelector(".contenedor");
-    this.datos = await getData(this.endPoint, "");
-    if (this.datos.data.length === 0) {
+    if (this.datos.length === 0) {
       alertaGenerica("No registered", contenedor);
     } else {
       contenedor.innerHTML = "";
     }
     const cuerpoTabal = document.querySelector("#info-tabla");
     cuerpoTabal.innerHTML = "";
-    this.datos.data.forEach((dato) => {
+    this.datos.forEach((dato) => {
       const { email, firstName, id, lastName1, lastName2, office } = dato;
       cuerpoTabal.innerHTML += /*html*/ `
                 <tr>
