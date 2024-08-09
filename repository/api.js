@@ -1,5 +1,4 @@
-  const URL_BASE = "http://localhost:8080";
-  // const URL_BASE = "http://127.0.0.1:5500";
+const URL_BASE = "http://localhost:8080";
 
 const headers = new Headers({
   "Content-Type": "application/json",
@@ -24,7 +23,7 @@ export async function getData(endpoint, embed = "") {
     } else if (response.status === 404) {
       console.error(
         "Error 404: El servidor no pudo encontrar el contenido solicitado"
-      );
+    );
       return { success: false, status: response.status, error: "Not Found" };
     } else {
       console.error(
@@ -41,40 +40,6 @@ export async function getData(endpoint, embed = "") {
     return { success: false, status: null, error: error };
   }
 }
-
-/** Implementacion
-    const endpoint = "api/endpoint";
-    const embed = "?param=value";
-
-    getData(endpoint, embed).then(result => {
-    if (result.success) {
-        console.log("Data fetched successfully:", result.data);
-    } else {
-        console.error("Error:", result.status, result.error);
-    }
-    });
- * 
- */
-
-/*
-export async function getData(endpoint, embed = "") {
-  try {
-    const response = await fetch(`${URL_BASE}/${endpoint}${embed}`);
-    if (response.status === 200) {
-      const data = await response.json();
-      return data;
-    } else if (response.status === 404) {
-      console.log("El servidor no pudo encontrar el contenido solicitado");
-    } else {
-      console.log(
-        "El servidor ha encontrado una situación que no sabe cómo manejarla"
-      );
-    }
-  } catch (error) {
-    console.log(error);
-  }
-}
-  */
 
 /**
  * Realiza una solicitud POST a un punto final específico.
@@ -103,7 +68,7 @@ export async function postData(data, endpoint) {
     }
 
     const responseData = await response.json();
-    console.log(responseData)
+    console.log(responseData);
     return { success: true, status: response.status, data: responseData };
   } catch (error) {
     // Manejar errores de red u otros errores
@@ -111,31 +76,6 @@ export async function postData(data, endpoint) {
     return { success: false, status: null, error: error };
   }
 }
-
-/** Implementacion
-   const data = { key: "value" };
-    const endpoint = "api/endpoint";
-
-    postData(data, endpoint).then(result => {
-    if (result.success) {
-        console.log("Success:", result.data);
-    } else {
-        console.error("Error:", result.status, result.error);
-    }
-    });
-    **/
-
-// export function postData(data, endpoint) {
-//   try {
-//     fetch(`${URL_BASE}/${endpoint}`, {
-//       method: "POST",
-//       headers: headers,
-//       body: JSON.stringify(data),
-//     });
-//   } catch (error) {
-//     console.log(error);
-//   }
-// }
 
 /**
  * Actualiza los datos en el servidor utilizando el método PUT.
@@ -170,33 +110,6 @@ export async function updateData(data, endpoint, id) {
     return { success: false, status: null, error: error };
   }
 }
-/** Implementacion
-    const data = { key: "updatedValue" };
-    const endpoint = "api/endpoint";
-    const id = 1;
-
-    updateData(data, endpoint, id).then(result => {
-    if (result.success) {
-        console.log("Success:", result.data);
-    } else {
-        console.error("Error:", result.status, result.error);
-    }
-    });
- */
-/*
-export function updateData(data, endpoint, id) {
-  console.log(id);
-  try {
-    fetch(`${URL_BASE}/${endpoint}/${id}`, {
-      method: "PUT",
-      headers: headers,
-      body: JSON.stringify(data),
-    });
-  } catch (error) {
-    console.log(error);
-  }
-}
-*/
 
 /**
  * Obtiene un único conjunto de datos del servidor.
@@ -212,7 +125,10 @@ export async function getOneData(id, endpoint) {
       const data = await response.json();
       return data;
     } else if (response.status === 404) {
-      console.log("El servidor no pudo encontrar el contenido solicitado"+ response.errorData);
+      console.log(
+        "El servidor no pudo encontrar el contenido solicitado" +
+          response.errorData
+      );
     } else {
       console.log(
         "El servidor ha encontrado una situación que no sabe cómo manejarla"
@@ -254,29 +170,3 @@ export async function deleteData(id, endpoint) {
     return { success: false, status: null, error: error };
   }
 }
-
-/** Implementacion
-    const id = 1;
-    const endpoint = "api/endpoint";
-
-    deleteData(id, endpoint).then(result => {
-    if (result.success) {
-        console.log("Delete successful, status:", result.status);
-    } else {
-        console.error("Error:", result.status, result.error);
-    }
-    });
- */
-
-/*
-export function deleteData(id, endpoint) {
-  try {
-    fetch(`${URL_BASE}/${endpoint}/${id}`, {
-      method: "DELETE",
-      headers: headers,
-    });
-  } catch (error) {
-    console.log(error);
-  }
-}
-*/

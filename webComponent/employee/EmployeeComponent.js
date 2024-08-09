@@ -238,18 +238,24 @@ export class EmployeeComponent extends HTMLElement {
       const filtro = await getData(
         "api/employees/by-office/" + obj.filterOffice
       );
-      console.log(filtro.data);
-      const convertedData = filtro.data.map((item) => {
-        return {
-          id: item[0],
-          firstName: item[1],
-          lastName1: item[2],
-          lastName2: item[3],
-          email: item[4],
-          office: item[5],
-        };
-      });
-      this.datos = convertedData;
+
+      if (filtro.success) {
+        const convertedData = filtro.data.map((item) => {
+          return {
+            id: item[0],
+            firstName: item[1],
+            lastName1: item[2],
+            lastName2: item[3],
+            email: item[4],
+            office: item[5],
+          };
+        });
+        this.datos = convertedData;
+      } else {
+        alertaTemporal(this.alerta, filtro.error, "danger");
+        this.datos = [];
+      }
+
       this.tabla();
     });
   }
@@ -292,10 +298,14 @@ export class EmployeeComponent extends HTMLElement {
       } else if (e.target.classList.contains("eliminar")) {
         if (pedirConfirmacion("este empleado")) {
           const response = await deleteData(id, this.endPoint);
-          if(response.success){
+          if (response.success) {
             alertaTemporal(this.alerta, "Eliminado correctacmente", "info");
-          }else{
-            alertaTemporal(this.alerta, "No se puede borrar este elemento porque está relacionada con otros datos", "danger");
+          } else {
+            alertaTemporal(
+              this.alerta,
+              "No se puede borrar este elemento porque está relacionada con otros datos",
+              "danger"
+            );
           }
           this.filtro();
         }
