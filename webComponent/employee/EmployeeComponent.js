@@ -4,7 +4,6 @@ import {
   poblarFormulario,
   alertaGenerica,
   alertaTemporal,
-  createSelect,
   pedirConfirmacion,
 } from "../../js/utils/form.js";
 
@@ -239,7 +238,7 @@ export class EmployeeComponent extends HTMLElement {
         "api/employees/by-office/" + obj.filterOffice
       );
 
-      if (filtro.success && data.data.length != 0) {
+      if (filtro.success && filtro.data.length != 0) {
         const convertedData = filtro.data.map((item) => {
           return {
             id: item[0],

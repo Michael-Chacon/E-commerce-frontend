@@ -268,26 +268,9 @@ export class ProductComponent extends HTMLElement {
     const filtroPorGama = document.querySelector("#gamaProducto");
     filtroPorGama.addEventListener("submit", async (e) => {
       e.preventDefault();
-      const data = new FormData(filtroPorGama);
-      const obj = Object.fromEntries(data);
-      console.log(obj);
-      filtroPorGama.reset();
-      manipularModal(document.querySelector("#filtroGama"), "hide");
+      const obj = this.getFormData(filtroPorGama, "#filtroGama");
       const filtro = await getData("api/products/by-range/" + obj.rangeCode);
-      console.log(filtro.data);
-      const convertedData = filtro.data.map((item) => {
-        return {
-          id: item[0],
-          name: item[1],
-          stockQuantity: item[2],
-          salePrice: item[3],
-          rangeCode: item[4],
-          productDescription: item[5],
-          dimensions: item[6],
-        };
-      });
-      console.log(convertedData);
-      this.datos = convertedData;
+      this.dto(filtro);
       this.tabla();
     });
 
@@ -295,16 +278,26 @@ export class ProductComponent extends HTMLElement {
     const filterByStock = document.querySelector("#stockProducto");
     filterByStock.addEventListener("submit", async (e) => {
       e.preventDefault();
-      const data = new FormData(filterByStock);
-      const obj = Object.fromEntries(data);
-      console.log(obj);
-      filterByStock.reset();
-      manipularModal(document.querySelector("#filtroStock"), "hide");
+      const obj = this.getFormData(filterByStock, "#filtroStock");
       const filtro = await getData(
         "api/products/by-low-stock/" + obj.stockQuantity
       );
-      console.log(filtro.data);
-      const convertedData = filtro.data.map((item) => {
+      this.dto(filtro);
+      this.tabla();
+    });
+  }
+
+  getFormData(form, modal) {
+    const data = new FormData(form);
+    const obj = Object.fromEntries(data);
+    form.reset();
+    manipularModal(document.querySelector(modal), "hide");
+    return obj;
+  }
+
+  dto(data) {
+    if (data.success && data.data.length != 0) {
+      const convertedData = data.data.map((item) => {
         return {
           id: item[0],
           name: item[1],
@@ -315,10 +308,11 @@ export class ProductComponent extends HTMLElement {
           dimensions: item[6],
         };
       });
-      console.log(convertedData);
       this.datos = convertedData;
-      this.tabla();
-    });
+    } else {
+      alertaTemporal(this.alerta, "Order not found", "danger");
+      this.datos = [];
+    }
   }
 
   async tabla() {
