@@ -27,10 +27,10 @@ export class ProductComponent extends HTMLElement {
     this.modal = document.querySelector("#modal");
     this.datos = [];
     this.gama = [];
+    this.filtro();
     this.llenarFormulario();
     this.registrar();
     this.detectarId();
-    this.filtro();
     this.alerta = document.querySelector(".alerta");
   }
 
@@ -127,6 +127,7 @@ export class ProductComponent extends HTMLElement {
 
   async llenarFormulario() {
     this.gama = await getData("api/productRanges");
+    console.log(this.gama.data);
 
     createSelect(this.filtroGama, "", "rangeCode", "", this.gama.data);
 
@@ -202,7 +203,7 @@ export class ProductComponent extends HTMLElement {
     botones.innerHTML = `
             <div class="modal-footer">
               <button type="button" class="btn btn-outline-danger" data-bs-dismiss="modal">Cancelar</button>
-              <button type="submit" class="btn btn-outline-dark" id="btnRegistrar">Registrar</button>
+              <button type="submit" class="btn btn-outline-dark" >Registrar</button>
             </div>
           `;
 
@@ -229,7 +230,8 @@ export class ProductComponent extends HTMLElement {
   registrar() {
     this.formulario.addEventListener("submit", async (e) => {
       e.preventDefault();
-
+      e.stopPropagation();
+      e.stopImmediatePropagation();
       const inputs = new FormData(this.formulario);
       const data = Object.fromEntries(inputs);
 
@@ -254,31 +256,38 @@ export class ProductComponent extends HTMLElement {
   async filtro() {
     const info = await getData(this.endPoint, "");
     this.datos = info.data;
+    console.log(this.datos);
+    this.tabla();
 
     const todo = document.querySelector("#mostrarTodo");
     todo.addEventListener("click", async (e) => {
       e.preventDefault();
+      e.stopPropagation();
+      e.stopImmediatePropagation();
       const info = await getData(this.endPoint, "");
       this.datos = info.data;
       this.tabla();
     });
-    this.tabla();
 
     // Filter for range code
-    const filtroPorGama = document.querySelector("#gamaProducto");
-    filtroPorGama.addEventListener("submit", async (e) => {
+    this.filtroGama.addEventListener("submit", async (e) => {
       e.preventDefault();
-      const obj = this.getFormData(filtroPorGama, "#filtroGama");
+      e.stopPropagation();
+      e.stopImmediatePropagation();
+      const obj = this.getFormData(this.filtroGama, "#filtroGama");
+      console.log("--------gama = " + obj.rangeCode);
       const filtro = await getData("api/products/by-range/" + obj.rangeCode);
       this.dto(filtro);
       this.tabla();
     });
 
     // Filter for amount in stock
-    const filterByStock = document.querySelector("#stockProducto");
-    filterByStock.addEventListener("submit", async (e) => {
+    this.filtroStock.addEventListener("submit", async (e) => {
       e.preventDefault();
-      const obj = this.getFormData(filterByStock, "#filtroStock");
+      e.stopPropagation();
+      e.stopImmediatePropagation();
+      const obj = this.getFormData(this.filtroStock, "#filtroStock");
+      console.log("--------cantidad = " + obj.stockQuantity);
       const filtro = await getData(
         "api/products/by-low-stock/" + obj.stockQuantity
       );
@@ -291,6 +300,7 @@ export class ProductComponent extends HTMLElement {
     const data = new FormData(form);
     const obj = Object.fromEntries(data);
     form.reset();
+    console.log(obj);
     manipularModal(document.querySelector(modal), "hide");
     return obj;
   }
@@ -316,6 +326,7 @@ export class ProductComponent extends HTMLElement {
   }
 
   async tabla() {
+    console.log("Hola desde tabla");
     const contenedor = document.querySelector(".contenedor");
     // this.datos = await getData(this.endPoint, "");
     if (this.datos.length === 0) {
@@ -345,6 +356,8 @@ export class ProductComponent extends HTMLElement {
     const cuerpoTabal = document.querySelector("#info-tabla");
     cuerpoTabal.addEventListener("click", async (e) => {
       e.preventDefault();
+      e.stopPropagation();
+      e.stopImmediatePropagation();
       const id = e.target.id;
       if (e.target.classList.contains("editar")) {
         const objeto = await this.buscarObjecto(id);

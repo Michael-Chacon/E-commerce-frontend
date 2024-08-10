@@ -318,6 +318,8 @@ export class OrderComponent extends HTMLElement {
   registrar() {
     this.formulario.addEventListener("submit", async (e) => {
       e.preventDefault();
+      e.stopPropagation();
+      e.stopImmediatePropagation();
 
       const inputs = new FormData(this.formulario);
       const data = Object.fromEntries(inputs);
@@ -363,6 +365,8 @@ export class OrderComponent extends HTMLElement {
     const todo = document.querySelector("#mostrarTodo");
     todo.addEventListener("click", async (e) => {
       e.preventDefault();
+      e.stopPropagation();
+      e.stopImmediatePropagation();
       const info = await getData(this.endPoint, "");
       this.datos = info.data;
       this.tabla();
@@ -373,6 +377,8 @@ export class OrderComponent extends HTMLElement {
 
     filtroEstado.addEventListener("submit", async (e) => {
       e.preventDefault();
+      e.stopPropagation();
+      e.stopImmediatePropagation();
       const obj = this.getFormData(filtroEstado, "#filtroEstado");
       const filtro = await getData("api/nOrders/by-status/" + obj.filtroStatus);
       this.dto(filtro);
@@ -382,6 +388,8 @@ export class OrderComponent extends HTMLElement {
     const filtrarPorFecha = document.querySelector("#rangoFecha");
     filtrarPorFecha.addEventListener("submit", async (e) => {
       e.preventDefault();
+      e.stopPropagation();
+      e.stopImmediatePropagation();
       const obj = this.getFormData(filtrarPorFecha, "#filtroRangoFecha");
       const filtro = await getData(
         `api/nOrders/by-range?startDate=${obj.startDate}&endDate=${obj.endDate}`
@@ -393,6 +401,8 @@ export class OrderComponent extends HTMLElement {
     const filtrarPorEmpleado = document.querySelector("#pedidosEmpleado");
     filtrarPorEmpleado.addEventListener("submit", async (e) => {
       e.preventDefault();
+      e.stopPropagation();
+      e.stopImmediatePropagation();
       const obj = this.getFormData(filtrarPorEmpleado, "#filtroPedidoAsignado");
       const filtro = await getData(
         `api/nOrders/employee/${obj.filtroEmpleado}`
@@ -476,6 +486,8 @@ export class OrderComponent extends HTMLElement {
     const cuerpoTabal = document.querySelector("#info-tabla");
     cuerpoTabal.addEventListener("click", async (e) => {
       e.preventDefault();
+      e.stopPropagation();
+      e.stopImmediatePropagation();
       const id = e.target.id;
       if (e.target.classList.contains("editar")) {
         const objeto = await this.buscarObjecto(id);

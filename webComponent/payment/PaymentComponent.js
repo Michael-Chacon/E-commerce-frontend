@@ -255,6 +255,8 @@ export class PaymentComponent extends HTMLElement {
   registrar() {
     this.formulario.addEventListener("submit", async (e) => {
       e.preventDefault();
+      e.stopPropagation();
+      e.stopImmediatePropagation();
 
       const inputs = new FormData(this.formulario);
       const data = Object.fromEntries(inputs);
@@ -286,6 +288,8 @@ export class PaymentComponent extends HTMLElement {
     const todo = document.querySelector("#mostrarTodo");
     todo.addEventListener("click", async (e) => {
       e.preventDefault();
+      e.stopPropagation();
+      e.stopImmediatePropagation();
       const info = await getData(this.endPoint, "");
       this.datos = info.data;
       this.tabla();
@@ -296,9 +300,11 @@ export class PaymentComponent extends HTMLElement {
     const formCustomer = document.querySelector("#pagoCliente");
     formCustomer.addEventListener("submit", async (e) => {
       e.preventDefault();
+      e.stopPropagation();
+      e.stopImmediatePropagation();
       const obj = this.getFormData(formCustomer, "#filtroCliente");
       const filtro = await getData(
-        "api/payments/by-method/" + obj.filterCustomer
+        "api/payments/by-customer/" + obj.filterCustomer
       );
       this.dto(filtro);
       this.tabla();
@@ -308,6 +314,8 @@ export class PaymentComponent extends HTMLElement {
     const formMethod = document.querySelector("#pagoMetodo");
     formMethod.addEventListener("submit", async (e) => {
       e.preventDefault();
+      e.stopPropagation();
+      e.stopImmediatePropagation();
       const obj = this.getFormData(formMethod, "#filtroMetodoPago");
       const filtro = await getData(
         "api/payments/by-method/" + obj.paymentMethodFilter
@@ -327,7 +335,7 @@ export class PaymentComponent extends HTMLElement {
 
   dto(data) {
     console.log(data);
-        
+
     if (data.success && data.data.length != 0) {
       const convertedData = data.data.map((item) => {
         return {
@@ -346,6 +354,8 @@ export class PaymentComponent extends HTMLElement {
   }
 
   async tabla() {
+    console.log("------------");
+    console.log(this.datos);
     const contenedor = document.querySelector(".contenedor");
     if (this.datos.length === 0) {
       alertaGenerica("No registered payments ", contenedor);
@@ -374,6 +384,8 @@ export class PaymentComponent extends HTMLElement {
     const cuerpoTabal = document.querySelector("#info-tabla");
     cuerpoTabal.addEventListener("click", async (e) => {
       e.preventDefault();
+      e.stopPropagation();
+      e.stopImmediatePropagation();
       const id = e.target.id;
       if (e.target.classList.contains("editar")) {
         const objeto = await this.buscarObjecto(id);

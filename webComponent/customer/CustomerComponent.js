@@ -255,6 +255,8 @@ export class CustomerComponent extends HTMLElement {
   registrar() {
     this.formulario.addEventListener("submit", async (e) => {
       e.preventDefault();
+      e.stopPropagation();
+      e.stopImmediatePropagation();
 
       const inputs = new FormData(this.formulario);
       const data = Object.fromEntries(inputs);
@@ -296,6 +298,8 @@ export class CustomerComponent extends HTMLElement {
     const todo = document.querySelector("#mostrarTodo");
     todo.addEventListener("click", async (e) => {
       e.preventDefault();
+      e.stopPropagation();
+      e.stopImmediatePropagation();
       const info = await getData(this.endPoint, "");
       this.datos = info.data;
       this.tabla();
@@ -306,6 +310,8 @@ export class CustomerComponent extends HTMLElement {
     const filtroEstado = document.querySelector("#clienteCiudad");
     filtroEstado.addEventListener("submit", async (e) => {
       e.preventDefault();
+      e.stopPropagation();
+      e.stopImmediatePropagation();
       const data = new FormData(filtroEstado);
       const obj = Object.fromEntries(data);
 
@@ -320,6 +326,8 @@ export class CustomerComponent extends HTMLElement {
     const pedidosPendientes = document.querySelector("#filtroPedidoPend");
     pedidosPendientes.addEventListener("click", async (e) => {
       e.preventDefault();
+      e.stopPropagation();
+      e.stopImmediatePropagation();
       const data = await getData("api/customers/pending-orders");
       this.dto(data);
       this.tabla();
@@ -328,7 +336,7 @@ export class CustomerComponent extends HTMLElement {
 
   dto(data) {
     console.log(data);
-    
+
     if (data.success && data.data.length != 0) {
       const convertedData = data.data.map((item) => {
         return {
@@ -345,7 +353,7 @@ export class CustomerComponent extends HTMLElement {
         };
       });
       this.datos = convertedData;
-    } else {   
+    } else {
       alertaTemporal(this.alerta, "Products not found", "danger");
       this.datos = [];
     }
@@ -382,6 +390,8 @@ export class CustomerComponent extends HTMLElement {
     const cuerpoTabal = document.querySelector("#info-tabla");
     cuerpoTabal.addEventListener("click", async (e) => {
       e.preventDefault();
+      e.stopPropagation();
+      e.stopImmediatePropagation();
       const id = e.target.id;
       if (e.target.classList.contains("editar")) {
         const objeto = await this.buscarObjecto(id);

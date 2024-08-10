@@ -12,6 +12,7 @@ const headers = new Headers({
  */
 
 export async function getData(endpoint, embed = "") {
+  console.log("-------------here");
   try {
     const response = await fetch(`${URL_BASE}/${endpoint}${embed}`, {
       headers: headers,
@@ -23,7 +24,7 @@ export async function getData(endpoint, embed = "") {
     } else if (response.status === 404) {
       console.error(
         "Error 404: El servidor no pudo encontrar el contenido solicitado"
-    );
+      );
       return { success: false, status: response.status, error: "Not Found" };
     } else {
       console.error(

@@ -192,6 +192,8 @@ export class EmployeeComponent extends HTMLElement {
   registrar() {
     this.formulario.addEventListener("submit", async (e) => {
       e.preventDefault();
+      e.stopPropagation();
+      e.stopImmediatePropagation();
 
       const inputs = new FormData(this.formulario);
       const data = Object.fromEntries(inputs);
@@ -217,6 +219,8 @@ export class EmployeeComponent extends HTMLElement {
     const todo = document.querySelector("#mostrarTodo");
     todo.addEventListener("click", async (e) => {
       e.preventDefault();
+      e.stopPropagation();
+      e.stopImmediatePropagation();
       const info = await getData(this.endPoint, "");
       this.datos = info.data;
       this.tabla();
@@ -227,6 +231,8 @@ export class EmployeeComponent extends HTMLElement {
     const formCustomer = document.querySelector("#empleadoOficina");
     formCustomer.addEventListener("submit", async (e) => {
       e.preventDefault();
+      e.stopPropagation();
+      e.stopImmediatePropagation();
       const data = new FormData(formCustomer);
       const obj = Object.fromEntries(data);
       console.log(obj);
@@ -286,6 +292,8 @@ export class EmployeeComponent extends HTMLElement {
     const cuerpoTabal = document.querySelector("#info-tabla");
     cuerpoTabal.addEventListener("click", async (e) => {
       e.preventDefault();
+      e.stopPropagation();
+      e.stopImmediatePropagation();
       const id = e.target.id;
       if (e.target.classList.contains("editar")) {
         const objeto = await this.buscarObjecto(id);

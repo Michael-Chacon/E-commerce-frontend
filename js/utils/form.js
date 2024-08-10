@@ -16,7 +16,7 @@ export function createImput(
     newLabel.setAttribute("for", iddinamico);
     newLabel.textContent = capitalizeFirstLetter(nombre);
   }
-                      
+
   const element = document.createElement(etiqueta);
   element.classList.add("form-control", "mb-3");
   element.setAttribute("type", tipo);
@@ -39,7 +39,13 @@ export function createImput(
   return elementoPadre;
 }
 
-export function createSelect(elementoPadre, iddinamico, nombre, subtexto, data){
+export function createSelect(
+  elementoPadre,
+  iddinamico,
+  nombre,
+  subtexto,
+  data
+) {
   const divPadre = document.createElement("div");
   divPadre.classList.add("mt-3");
 
@@ -48,7 +54,7 @@ export function createSelect(elementoPadre, iddinamico, nombre, subtexto, data){
   newLabel.setAttribute("for", iddinamico);
   newLabel.textContent = capitalizeFirstLetter(nombre);
 
-  const select = document.createElement('select');
+  const select = document.createElement("select");
   select.classList.add("form-select", "mb-3");
   select.setAttribute("id", iddinamico);
   select.setAttribute("name", nombre);
@@ -57,15 +63,15 @@ export function createSelect(elementoPadre, iddinamico, nombre, subtexto, data){
   select.setAttribute("aria-label", "Default select example");
 
   // console.log(data)
-  data.forEach(item => {
-    const option = document.createElement('option');
+  data.forEach((item) => {
+    const option = document.createElement("option");
     option.value = item.id;
     option.textContent = item.name;
     select.appendChild(option);
   });
 
   divPadre.appendChild(newLabel);
-  
+
   divPadre.appendChild(select);
   elementoPadre.appendChild(divPadre);
   return elementoPadre;
@@ -134,9 +140,9 @@ export function alertaTemporal(padre, mensaje, color) {
   padre.appendChild(alert);
   setTimeout(() => {
     padre.removeChild(alert);
-  }, 1000);
+  }, 3000);
 }
 
-export function pedirConfirmacion(element){
-  return confirm("¿Está seguro de que quiere eliminar " + element + "?")
+export function pedirConfirmacion(element) {
+  return confirm("¿Está seguro de que quiere eliminar " + element + "?");
 }
