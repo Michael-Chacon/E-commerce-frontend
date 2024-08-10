@@ -139,7 +139,6 @@ export class EmployeeComponent extends HTMLElement {
     selectOficina.innerHTML = `
     <label for="office_id" class="form-label mt-3">Office</label>
     <select class="form-select " name="office_id" id="office_id" required aria-label="Employees">
-        <option>Select office</option>
     </select>
     `;
     this.formulario.appendChild(selectOficina);
@@ -157,7 +156,6 @@ export class EmployeeComponent extends HTMLElement {
     selectOficinaFilter.innerHTML = `
     <label for="filterOffice" class="form-label mt-3">Office</label>
     <select class="form-select " name="filterOffice" id="filterOffice" required aria-label="Employees">
-        <option>Offices</option>
     </select>
     `;
     document.querySelector("#empleadoOficina").appendChild(selectOficinaFilter);

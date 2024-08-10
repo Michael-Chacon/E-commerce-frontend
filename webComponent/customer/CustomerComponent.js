@@ -308,12 +308,12 @@ export class CustomerComponent extends HTMLElement {
       e.preventDefault();
       const data = new FormData(filtroEstado);
       const obj = Object.fromEntries(data);
-      filtroEstado.reset();
 
       manipularModal(document.querySelector("#filtroCiudad"), "hide");
       const filtro = await getData("api/customers/by-city/" + obj.city);
       this.dto(filtro);
       this.tabla();
+      filtroEstado.reset();
     });
 
     //Filter by pending orders
@@ -327,6 +327,8 @@ export class CustomerComponent extends HTMLElement {
   }
 
   dto(data) {
+    console.log(data);
+    
     if (data.success && data.data.length != 0) {
       const convertedData = data.data.map((item) => {
         return {
@@ -343,7 +345,7 @@ export class CustomerComponent extends HTMLElement {
         };
       });
       this.datos = convertedData;
-    } else {
+    } else {   
       alertaTemporal(this.alerta, "Products not found", "danger");
       this.datos = [];
     }

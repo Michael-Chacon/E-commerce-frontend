@@ -134,7 +134,7 @@ export function alertaTemporal(padre, mensaje, color) {
   padre.appendChild(alert);
   setTimeout(() => {
     padre.removeChild(alert);
-  }, 4000);
+  }, 1000);
 }
 
 export function pedirConfirmacion(element){

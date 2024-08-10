@@ -202,7 +202,6 @@ export class PaymentComponent extends HTMLElement {
     selectFilterPayment.innerHTML = `
         <label for="paymentMethodFilter" class="form-label mt-3">Customer</label>
         <select class="form-select " name="paymentMethodFilter" id="paymentMethodFilter" required aria-label="Employees">
-            <option>Cliente que paga</option>
         </select>
         `;
     document.querySelector("#pagoMetodo").appendChild(selectFilterPayment);
@@ -230,7 +229,6 @@ export class PaymentComponent extends HTMLElement {
     selectFilterCliente.innerHTML = `
         <label for="filterCustomer" class="form-label mt-3">Customer</label>
         <select class="form-select " name="filterCustomer" id="filterCustomer" required aria-label="Employees">
-            <option>Cliente que paga</option>
         </select>
         `;
     document.querySelector("#pagoCliente").appendChild(selectFilterCliente);
@@ -328,6 +326,8 @@ export class PaymentComponent extends HTMLElement {
   }
 
   dto(data) {
+    console.log(data);
+        
     if (data.success && data.data.length != 0) {
       const convertedData = data.data.map((item) => {
         return {

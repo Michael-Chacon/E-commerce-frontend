@@ -185,7 +185,7 @@ export class ProductComponent extends HTMLElement {
     selectCliente.innerHTML = `
     <label for="rangeCode" class="form-label mt-3">rangeCode</label>
     <select class="form-select " name="rangeCode" id="rangeCode" required aria-label="Employees">
-        <option>Gamas</option>
+
     </select>
     `;
     this.formulario.appendChild(selectCliente);
