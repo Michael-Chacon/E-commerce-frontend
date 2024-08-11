@@ -16,33 +16,47 @@
     />
     <script src="controller/mainController.js" type="module" defer></script>
     <title>E-commerce</title>
-    <style>
-      .bx-pencil, .bx-detail{
-        font-size: 25px;
-        color: black;
-      }
-      .bx-pencil:hover{
-        color: blue;
-        cursor: pointer;
-      }
-
-      .bx-detail:hover{
-        color: blue;
-        cursor: pointer;
-      }
-      .bx-trash-alt{
-        font-size: 25px;
-      }
-      .bx-trash-alt:hover{
-        color:red;
-        cursor: pointer;
-        transition: ease 0.5;
-      }
-    </style>
   </head>
-  <body>
-        <menu-component></menu-component>
-    <!-- <order-detail-component></order-detail-component> -->
-    <script src="js/utils/menu.js" defer></script>
+  <body class="bg-dark">
+    <div id="loginOComponentes">
+      <div
+        class="container vh-100 d-flex justify-content-center align-items-center"
+      >
+        <div class="col-md-4">
+          <div class="card p-4 shadow-sm">
+            <h3 class="text-center mb-4">Login</h3>
+            <form id="formulario">
+              <div class="mb-3">
+                <label for="username" class="form-label">Username</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  id="username"
+                  placeholder="Enter your username"
+                  name="username"
+                />
+              </div>
+              <div class="mb-3">
+                <label for="password" class="form-label">Password</label>
+                <input
+                  type="password"
+                  class="form-control"
+                  id="password"
+                  placeholder="Enter your password"
+                  name="password"
+                />
+                <small
+                  class="text-center"
+                  id="credencialesErroneas"
+                  style="color: red"
+                  ></small
+                >
+              </div>
+              <button type="submit" class="btn btn-primary w-100">Login</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
   </body>
 </html>

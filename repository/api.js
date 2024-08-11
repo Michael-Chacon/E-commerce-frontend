@@ -5,6 +5,49 @@ const headers = new Headers({
 });
 
 /**
+ * Realiza una solicitud POST para obtener el token.
+ * @param {Object} data - Los datos que se enviarán en la solicitud POST.
+ * @returns {Promise<Response>} Una promesa que se resuelve con la respuesta de la solicitud POST.
+ */
+
+export async function login(data) {
+  // console.log(data)
+  try {
+    const response = await fetch(`${URL_BASE}/login`, {
+      method: "POST",
+      headers: headers,
+      body: JSON.stringify(data),
+    });
+
+    if (!response.ok) {
+      // Manejar errores HTTP
+      const errorData = await response.json();
+      console.error(
+        `Error ${response.status}: ${response.statusText}`,
+        errorData
+      );
+      return { success: false, status: response.status, error: errorData };
+    }
+
+    const responseData = await response.json();
+    return { success: true, status: response.status, data: responseData };
+  } catch (error) {
+    // Manejar errores de red u otros errores
+    console.error("Network error:", error);
+    return { success: false, status: null, error: error };
+  }
+}
+
+// Metodo para obtener el token de localStorage
+const token = () => {
+  const headersjwt = new Headers({
+    "Content-Type": "application/json",
+    Authorization: "Bearer " + localStorage.getItem("tokenJwt"),
+  });
+  return headersjwt;
+};
+
+/**
  * Obtiene datos de un endpoint específico.
  * @param {string} endpoint - El endpoint al que se enviará la solicitud.
  * @param {string} [embed=""] - Parámetro opcional para incrustar datos adicionales.
@@ -15,7 +58,7 @@ export async function getData(endpoint, embed = "") {
   console.log("-------------here");
   try {
     const response = await fetch(`${URL_BASE}/${endpoint}${embed}`, {
-      headers: headers,
+      headers: token(),
     });
 
     if (response.ok) {
@@ -54,7 +97,7 @@ export async function postData(data, endpoint) {
   try {
     const response = await fetch(`${URL_BASE}/${endpoint}`, {
       method: "POST",
-      headers: headers,
+      headers: token(),
       body: JSON.stringify(data),
     });
 
@@ -69,7 +112,6 @@ export async function postData(data, endpoint) {
     }
 
     const responseData = await response.json();
-    console.log(responseData);
     return { success: true, status: response.status, data: responseData };
   } catch (error) {
     // Manejar errores de red u otros errores
@@ -89,7 +131,7 @@ export async function updateData(data, endpoint, id) {
   try {
     const response = await fetch(`${URL_BASE}/${endpoint}/${id}`, {
       method: "PUT",
-      headers: headers,
+      headers: token(),
       body: JSON.stringify(data),
     });
 
@@ -121,7 +163,9 @@ export async function updateData(data, endpoint, id) {
  */
 export async function getOneData(id, endpoint) {
   try {
-    const response = await fetch(`${URL_BASE}/${endpoint}/${id}`);
+    const response = await fetch(`${URL_BASE}/${endpoint}/${id}`, {
+      headers: token(),
+    });
     if (response.status === 200) {
       const data = await response.json();
       return data;
@@ -151,7 +195,7 @@ export async function deleteData(id, endpoint) {
   try {
     const response = await fetch(`${URL_BASE}/${endpoint}/${id}`, {
       method: "DELETE",
-      headers: headers,
+      headers: token(),
     });
 
     if (!response.ok) {

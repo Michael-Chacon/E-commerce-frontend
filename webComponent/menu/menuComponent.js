@@ -2,6 +2,7 @@ export class MenuComponent extends HTMLElement {
   constructor() {
     super();
     this.render();
+    this.cerrarSesion();
   }
 
   render() {
@@ -88,7 +89,7 @@ export class MenuComponent extends HTMLElement {
           <li>
             <a href="#"><i class="bx bxs-cog"></i> Settings</a>
           </li>
-          <li>
+          <li id="cerrarSesion">
             <a href="#"><i class="bx bxs-log-out-circle"></i> Logout</a>
           </li>
         </ul>
@@ -134,6 +135,14 @@ export class MenuComponent extends HTMLElement {
       } else if (option === "listaPedidos") {
         main.innerHTML = `<order-component></order-component>`;
       }
+    });
+  }
+
+  cerrarSesion() {
+    const cerrar = document.querySelector("#cerrarSesion");
+    cerrar.addEventListener("click", (e) => {
+      localStorage.removeItem("tokenJwt");
+      window.location.href = "index.html";
     });
   }
 }

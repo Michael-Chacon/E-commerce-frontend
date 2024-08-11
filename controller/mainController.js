@@ -11,4 +11,29 @@ import "/webComponent/product/ProductComponent.js";
 import "/webComponent/order/OrderComponent.js";
 import "/webComponent/orderDetail/OrderDetailComponent.js";
 
+import { login, getData } from "../../repository/api.js";
 
+const formulario = document.querySelector("#formulario");
+formulario.addEventListener("submit", async (e) => {
+  e.preventDefault();
+  e.stopPropagation();
+  e.stopImmediatePropagation();
+
+  const formData = new FormData(formulario);
+  const objeto = Object.fromEntries(formData);
+  const respuesta = await login(objeto);
+  console.log(respuesta);
+  if (respuesta.status === 200) {
+    localStorage.removeItem("tokenJwt");
+    localStorage.setItem("tokenJwt", respuesta.data.token);
+    window.location.href = "main.html";
+  } else {
+    document.querySelector("#credencialesErroneas").textContent =
+      respuesta.error.message;
+      formulario.reset();
+    setTimeout(() => {
+      document.querySelector("#credencialesErroneas").textContent = "";
+    }, 3000);
+
+  }
+});

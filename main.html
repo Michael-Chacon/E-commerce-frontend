@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="css/bootstrap/bootstrap.css" />
+    <script type="module" defer src="js/bootstrap/bootstrap.bundle.js"></script>
+    <link
+      rel="shortcut icon"
+      href="storage/imgs/favicon.png"
+      type="image/x-icon"
+    />
+    <!-- <script src="js/utils/menu.js" defer></script> -->
+    <script src="controller/mainController.js" type="module" defer></script>
+    <title>E-commerce</title>
+    <style>
+      .bx-pencil,
+      .bx-detail {
+        font-size: 25px;
+        color: black;
+      }
+      .bx-pencil:hover {
+        color: blue;
+        cursor: pointer;
+      }
+
+      .bx-detail:hover {
+        color: blue;
+        cursor: pointer;
+      }
+      .bx-trash-alt {
+        font-size: 25px;
+      }
+      .bx-trash-alt:hover {
+        color: red;
+        cursor: pointer;
+        transition: ease 0.5;
+      }
+    </style>
+  </head>
+  <body>
+    <menu-component></menu-component>
+    <!-- <order-detail-component></order-detail-component> -->
+    <script src="js/utils/menu.js" defer type="module"></script>
+  </body>
+</html>
