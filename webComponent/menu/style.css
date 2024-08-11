@@ -14,7 +14,7 @@
 	--dark: #000;
 	--green: #81D43A;
 	--light-green: #E3FFCB;
-	--blue: #1775F1;
+	--blue: #FFDA76;
 	--light-blue: #D0E4FF;
 	--dark-blue: #0C5FCD;
 	--red: #FC3B56;
@@ -81,6 +81,8 @@ li {
 	background: var(--light);
 	transition: all .3s ease;
 	padding: 0 6px;
+	color: #ea6b7e;
+	justify-content: center;
 }
 #sidebar .icon {
 	min-width: 48px;
@@ -116,7 +118,7 @@ li {
 	white-space: nowrap;
 }
 #sidebar .side-menu > li > a:hover {
-	background: var(--grey);
+	background: var(--blue);
 }
 #sidebar .side-menu > li > a.active .icon-right {
 	transform: rotateZ(90deg);
@@ -124,7 +126,7 @@ li {
 #sidebar .side-menu > li > a.active,
 #sidebar .side-menu > li > a.active:hover {
 	background: var(--blue);
-	color: var(--light);
+	color: #000;
 }
 #sidebar .divider {
 	margin-top: 24px;
@@ -225,6 +227,7 @@ nav {
 nav .toggle-sidebar {
 	font-size: 18px;
 	cursor: pointer;
+	
 }
 nav form {
 	max-width: 400px;
@@ -576,6 +579,60 @@ main .btn-send {
 }
 main .btn-send:hover {
 	background: var(--dark-blue);
+}
+
+main h2{
+	text-align: center;
+	font-size: 3rem;
+
+
+	/* text-fill-color: transparent; */
+}
+
+h2 .tripleColor {
+	background: linear-gradient(to bottom, #FFCD00 55%, #003087 50%, #003087 75%, #C8102E 75% );
+	-webkit-background-clip: text;
+	-webkit-text-fill-color: transparent;
+	background-clip: text;
+}
+
+main p {
+	text-align: center;
+	font-size: 2rem;
+	margin-bottom: 0;
+}
+
+/* main .imagen {
+	text-align: right;
+} */
+
+.img{
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	
+}
+
+.imagen {
+	max-width: 36%;
+	height: auto;
+}
+
+#sidebar i{
+	font-size: 2rem;
+}
+
+.logo1 {
+	width: 25%;
+	height: auto;
+}
+
+a span {
+	font-size: 2rem;
+}
+
+.nombreEmpresa {
+	color: #ea6b7e;
 }
 /* MAIN */
 /* CONTENT */

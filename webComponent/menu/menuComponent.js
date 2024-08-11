@@ -10,7 +10,7 @@ export class MenuComponent extends HTMLElement {
         @import "/webComponent/menu/style.css";
     </style>
     <section id="sidebar">
-    <a href="#" class="brand"><i class='bx bxs-dashboard icon'></i>E-commerce</a>
+    <a href="#" class="brand"><img class="logo1" src="../storage/images/logo-removebg-preview.png"><span>Vendo</span></a>
     <ul class="side-menu">
       <!-- <li>
         <a href="#" class="active"
@@ -67,7 +67,7 @@ export class MenuComponent extends HTMLElement {
       </ul>
     </li>
 
-</ul>
+  </ul>
   </section>
   <section id="content">
     <!-- NAVBAR -->
@@ -98,8 +98,10 @@ export class MenuComponent extends HTMLElement {
 
     <!-- MAIN -->
     <main class="main">
-      <h2 class="paginaInicial">Bienvenido al gestor de activos de CampusLands</h2>
-      <p class="contenidoPaginaInicial">A continuación selecciona una de las opciones de nuestro menú</p>
+      <h2 class="paginaInicial">Bienvenido a <span class="nombreEmpresa">Vendo</span>, los mejores productos del mercado <span class="tripleColor">colombiano</span></h2>
+      <p class="contenidoPaginaInicial">Selecciona una de las opciones de nuestro menú lateral</p>
+      <div class="img"><img class="imagen" src="../storage/images/logo-removebg-preview.png" alt="Logo"></div>
+      
     </main>
     <!-- MAIN -->
   </section>
